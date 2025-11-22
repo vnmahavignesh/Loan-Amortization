@@ -1,0 +1,179 @@
+/* Enhanced Validation Styles */
+.input-field.success {
+    background: #e8f5e8;
+    border: 2px solid #27ae60;
+    box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+}
+
+.input-field.error {
+    background: #ffeaea;
+    border: 2px solid #e74c3c;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+    animation: shake 0.5s ease-in-out;
+}
+
+.input-field:focus.error {
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.3);
+}
+
+.input-field:focus.success {
+    box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.3);
+}
+
+.error-message {
+    color: #e74c3c;
+    font-size: 0.8em;
+    font-weight: 600;
+    margin-top: 5px;
+    display: none;
+    background: #ffeaea;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border-left: 4px solid #e74c3c;
+}
+
+.error-message.show {
+    display: block;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.success-message {
+    color: #27ae60;
+    font-size: 0.8em;
+    font-weight: 600;
+    margin-top: 5px;
+    display: none;
+    background: #e8f5e8;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border-left: 4px solid #27ae60;
+}
+
+.success-message.show {
+    display: block;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Shake animation for invalid inputs */
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-5px);
+    }
+
+    75% {
+        transform: translateX(5px);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Validation icons */
+.input-item {
+    position: relative;
+}
+
+.validation-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    display: none;
+}
+
+.validation-icon.success {
+    color: #27ae60;
+    display: block;
+}
+
+.validation-icon.error {
+    color: #e74c3c;
+    display: block;
+}
+
+/* Enhanced table validation */
+.rate-input.error {
+    border: 2px solid #e74c3c;
+    background: #ffeaea;
+    animation: shake 0.5s ease-in-out;
+}
+
+.rate-input.success {
+    border: 2px solid #27ae60;
+    background: #e8f5e8;
+}
+
+/* Tooltip styles for error messages */
+[tooltip] {
+    position: relative;
+}
+
+[tooltip]::before {
+    content: attr(tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+    z-index: 1000;
+}
+
+[tooltip]:hover::before {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Focus states for accessibility */
+.input-field:focus {
+    outline: none;
+}
+
+.input-field:focus-visible {
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.5);
+}
+
+/* Required field indicators */
+.input-label.required::after {
+    content: " *";
+    color: #e74c3c;
+}
+
+/* Disabled state styling */
+.input-field:disabled {
+    background: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Readonly state styling */
+.input-field[readonly] {
+    background: #f9f9f9;
+    border-color: #ddd;
+    color: #666;
+}

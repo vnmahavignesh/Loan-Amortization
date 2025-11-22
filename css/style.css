@@ -1,0 +1,890 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 20px;
+    min-height: 100vh;
+}
+
+/* Full-width banner for the title */
+.title-banner {
+    width: 100%;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 30px;
+    margin-bottom: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: #667eea;
+    margin: 0;
+    font-size: 2.5em;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.section-subtitle {
+    margin-top: 20px;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+/* Full-width loan inputs section */
+.loan-inputs-banner {
+    width: 100%;
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 30px;
+    margin-bottom: 20px;
+}
+
+.input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.input-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+}
+
+.input-label {
+    font-size: 0.9em;
+    font-weight: 600;
+    color: #333;
+}
+
+.input-field {
+    padding: 14px 18px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.15em;
+    font-weight: 500;
+    text-align: center;
+    background: #f5f6fa;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
+    transition: box-shadow 0.3s, background 0.3s;
+}
+
+.input-field:focus {
+    outline: none;
+    background: #e0e7ff;
+    box-shadow: 0 0 0 3px #667eea44;
+}
+
+.input-field.error {
+    border: 2px solid #e74c3c;
+    background: #ffeaea;
+}
+
+.input-field.auto-calculated {
+    background: #e8f5e8;
+}
+
+.error-message {
+    color: #e74c3c;
+    font-size: 0.8em;
+    font-weight: 600;
+    margin-top: 5px;
+    display: none;
+}
+
+.error-message.show {
+    display: block;
+}
+
+.auto-calc-indicator {
+    position: absolute;
+    top: -8px;
+    right: 10px;
+    background: #27ae60;
+    color: white;
+    font-size: 0.7em;
+    padding: 2px 8px;
+    border-radius: 10px;
+    display: none;
+}
+
+.auto-calc-indicator.show {
+    display: block;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.generate-btn {
+    padding: 14px 40px;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.1em;
+    font-weight: 600;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.generate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+}
+
+.generate-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.4);
+}
+
+.generate-btn:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.status-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50px;
+    margin-top: 15px;
+}
+
+.unsaved-indicator {
+    background: #fff3cd;
+    color: #856404;
+    padding: 12px 20px;
+    border-radius: 8px;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    justify-content: center;
+}
+
+.unsaved-indicator.show {
+    display: flex;
+}
+
+.save-status {
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s;
+    background: #c8e6c9;
+    color: #2e7d32;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+}
+
+.save-status.show {
+    opacity: 1;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-save {
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+    color: white;
+}
+
+.btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+.btn-export {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    color: white;
+}
+
+.btn-export:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.btn-clear {
+    background: linear-gradient(135deg, #ef5350 0%, #e53935 100%);
+    color: white;
+}
+
+.btn-clear:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(239, 83, 80, 0.4);
+}
+
+.btn-details {
+    background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+    color: white;
+}
+
+.btn-details:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(142, 68, 173, 0.4);
+}
+
+.year-filter-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    padding: 0 10px;
+}
+
+.year-filter-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.year-filter-label {
+    font-weight: 600;
+    color: #667eea;
+    font-size: 1em;
+}
+
+.year-filter-select {
+    padding: 10px 20px;
+    border: 2px solid #667eea;
+    border-radius: 25px;
+    font-size: 1em;
+    font-weight: 600;
+    background: white;
+    color: #667eea;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+    transition: all 0.3s;
+    min-width: 120px;
+}
+
+.year-filter-select:hover {
+    background: #667eea;
+    color: white;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.year-filter-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+}
+
+.table-container {
+    overflow-x: auto;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    margin-top: 30px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    text-align: center;
+}
+
+thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+th {
+    padding: 15px 10px;
+    text-align: center;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+td {
+    padding: 12px 10px;
+    text-align: center;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+tbody tr:hover {
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 30%);
+}
+
+tbody tr:nth-child(even) {
+    background: #f8f9fa;
+}
+
+input[type="number"],
+input[type="date"],
+input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 0.9em;
+    transition: border 0.3s;
+    box-sizing: border-box;
+}
+
+input[type="number"]:focus,
+input[type="date"]:focus,
+input[type="text"]:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+input[type="number"]:disabled {
+    background: #f5f5f5;
+    cursor: not-allowed;
+}
+
+.rate-input {
+    width: 80px;
+    padding: 6px 8px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 0.9em;
+    text-align: center;
+    transition: border 0.3s;
+}
+
+.rate-input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.rate-input.error {
+    border: 2px solid #e74c3c;
+    background: #ffeaea;
+}
+
+.negative {
+    color: #e74c3c;
+    font-weight: bold;
+}
+
+.positive {
+    color: #27ae60;
+    font-weight: bold;
+}
+
+.paid-row {
+    background: linear-gradient(135deg, #c8e6c9 0%, #a5d6a7 100%) !important;
+}
+
+.year-summary {
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    display: none;
+}
+
+.year-summary.show {
+    display: block;
+}
+
+.year-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.year-summary-item {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    text-align: center;
+}
+
+.year-summary-label {
+    color: #666;
+    font-size: 0.85em;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.year-summary-value {
+    color: #667eea;
+    font-size: 1.4em;
+    font-weight: 700;
+}
+
+/* Full-width summary sections */
+.outer-summary {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+/* Payment Details Page Styles */
+.payment-details-page {
+    display: none;
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    margin-top: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.payment-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #667eea;
+}
+
+.payment-details-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.payment-details-table th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 10px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.payment-details-table td {
+    padding: 12px 10px;
+    text-align: center;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.payment-details-table tr:nth-child(even) {
+    background: #f8f9fa;
+}
+
+.payment-details-table tr:hover {
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 30%);
+}
+
+/* Prepayment Details Page Styles */
+.prepayment-details-page {
+    display: none;
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    margin-top: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.prepayment-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #667eea;
+}
+
+.prepayment-details-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.prepayment-details-table th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 10px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.prepayment-details-table td {
+    padding: 12px 10px;
+    text-align: center;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.prepayment-details-table tr:nth-child(even) {
+    background: #f8f9fa;
+}
+
+.prepayment-details-table tr:hover {
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 30%);
+}
+
+/* Charges Details Page Styles */
+.charges-details-page {
+    display: none;
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    margin-top: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.charges-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #9b59b6;
+}
+
+.charges-details-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.charges-details-table th {
+    background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+    color: white;
+    padding: 15px 10px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.charges-details-table td {
+    padding: 12px 10px;
+    text-align: center;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.charges-details-table tr:nth-child(even) {
+    background: #f8f9fa;
+}
+
+.charges-details-table tr:hover {
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 30%);
+}
+
+.back-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+}
+
+.back-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.prepayment-link {
+    color: #2ecc71;
+    font-weight: 700;
+    text-decoration: underline;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.prepayment-link:hover {
+    color: #27ae60;
+}
+
+.charges-link {
+    color: #9b59b6;
+    font-weight: 700;
+    text-decoration: underline;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.charges-link:hover {
+    color: #8e44ad;
+}
+
+.payment-details-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.prepayment-details-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.charges-details-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* New styles for multiple prepayments and charges */
+.prepayment-manager,
+.charges-manager {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    width: 90%;
+    max-width: 700px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.prepayment-manager-overlay,
+.charges-manager-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+.prepayment-manager.show,
+.charges-manager.show {
+    display: block;
+}
+
+.prepayment-manager-overlay.show,
+.charges-manager-overlay.show {
+    display: block;
+}
+
+.prepayment-manager-header,
+.charges-manager-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #667eea;
+}
+
+.prepayment-list,
+.charges-list {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.prepayment-item,
+.charges-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #f0f0f0;
+    background: #f8f9fa;
+    margin-bottom: 8px;
+    border-radius: 6px;
+}
+
+.prepayment-item:last-child,
+.charges-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.prepayment-item-details,
+.charges-item-details {
+    flex: 1;
+}
+
+.prepayment-item-amount,
+.charges-item-amount {
+    font-weight: 700;
+    color: #f39c12;
+    margin-right: 15px;
+}
+
+.prepayment-item-date,
+.charges-item-date {
+    color: #666;
+    font-size: 0.9em;
+}
+
+.prepayment-item-description,
+.charges-item-description {
+    color: #666;
+    font-size: 0.85em;
+    font-style: italic;
+    margin-top: 4px;
+    display: block;
+}
+
+.prepayment-item-actions,
+.charges-item-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-small {
+    padding: 6px 12px;
+    font-size: 0.85em;
+    border-radius: 4px;
+}
+
+.btn-edit {
+    background: #3498db;
+    color: white;
+    border: none;
+}
+
+.btn-delete {
+    background: #e74c3c;
+    color: white;
+    border: none;
+}
+
+.add-prepayment-form,
+.add-charges-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.prepayment-summary,
+.charges-summary {
+    background: #e8f5e8;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: 600;
+    color: #27ae60;
+}
+
+.manage-prepayments-btn,
+.manage-charges-btn {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85em;
+    font-weight: 600;
+    transition: all 0.3s;
+    width: 100%;
+    justify-content: center;
+    min-height: 36px;
+}
+
+.manage-prepayments-btn:hover,
+.manage-charges-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+}
+
+.manage-prepayments-btn.has-prepayments,
+.manage-charges-btn.has-charges {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+}
+
+.manage-prepayments-btn.has-prepayments:hover,
+.manage-charges-btn.has-charges:hover {
+    box-shadow: 0 4px 12px rgba(243, 156, 18, 0.4);
+}
+
+/* Inline editing styles */
+.edit-prepayment-form,
+.edit-charges-form {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border: 2px solid #667eea;
+}
+
+.edit-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 10px;
+    align-items: end;
+}
+
+.edit-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.edit-form-field label {
+    font-size: 0.8em;
+    font-weight: 600;
+    color: #333;
+}
+
+.edit-form-field input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.edit-form-field input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+.edit-form-actions {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
