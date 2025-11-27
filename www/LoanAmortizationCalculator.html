@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="css/enhancement.css">
     <link rel="stylesheet" href="css/draggable.css">
     <link rel="stylesheet" href="css/navigationbar.css">
+    <link rel="stylesheet" href="css/accordion.css">
 
     <style>
         @media (max-width: 768px) {
@@ -30,6 +31,11 @@
 </head>
 
 <body>
+    <div class="app">
+        <div id="deviceready" class="blink">
+            <p class="event listening">Dev by Maha Vignesh</p>
+        </div>
+    </div>
     <!-- Mobile Menu Button (visible only on mobile) -->
     <button class="mobile-menu-btn" onclick="toggleSidebar()" style="display: none;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -154,141 +160,129 @@
     </div>
 
     <!-- Summary Section -->
+    <!-- Replace the existing Summary Section in LoanAmortizationCalculator.html -->
     <div id="summarySection" class="outer-summary" style="display: none;">
-        <div
-            style="background: linear-gradient(135deg, #e0f7fa 0%, #fff9c4 100%); border-radius: 15px; padding: 20px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);">
+        <div class="summary-accordion">
 
-            <!-- Compact 3-Column Layout -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px;">
-
-                <!-- Column 1: Loan Summary -->
-                <div
-                    style="background: rgba(255,255,255,0.95); padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);">
-                    <h3
-                        style="margin-bottom: 12px; color: #333; font-size: 1.1em; border-bottom: 2px solid #667eea; padding-bottom: 8px;">
-                        📊 Loan Summary</h3>
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f8f9fa; border-radius: 6px;">
-                            <span style="color: #666; font-size: 0.85em; font-weight: 600;">💵 Loan Amount</span>
-                            <span id="summaryLoanAmount"
-                                style="color: #667eea; font-size: 1.1em; font-weight: 700;">₹0.00</span>
-                        </div>
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f8f9fa; border-radius: 6px;">
-                            <span style="color: #666; font-size: 0.85em; font-weight: 600;">📅 Tenure</span>
-                            <span id="summaryTenure"
-                                style="color: #764ba2; font-size: 1.1em; font-weight: 700;">0</span>
-                        </div>
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f8f9fa; border-radius: 6px;">
-                            <span style="color: #666; font-size: 0.85em; font-weight: 600;">💰 Total Interest</span>
-                            <span id="summaryTotalInterest"
-                                style="color: #e74c3c; font-size: 1.1em; font-weight: 700;">₹0.00</span>
-                        </div>
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f8f9fa; border-radius: 6px;">
-                            <span style="color: #666; font-size: 0.85em; font-weight: 600;">💳 Total Amount</span>
-                            <span id="summaryTotalAmount"
-                                style="color: #f39c12; font-size: 1.1em; font-weight: 700;">₹0.00</span>
-                        </div>
+            <!-- Loan Summary Section -->
+            <div class="accordion-section loan-summary-section">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span>📊</span>
+                        <span>Loan Summary</span>
                     </div>
+                    <svg class="accordion-icon chevron-icon" viewBox="0 0 24 24">
+                        <path d="M6 9l6 6 6-6" />
+                    </svg>
                 </div>
-
-                <!-- Column 2: Savings Summary -->
-                <div
-                    style="background: rgba(255,255,255,0.95); padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);">
-                    <h3
-                        style="margin-bottom: 12px; color: #333; font-size: 1.1em; border-bottom: 2px solid #27ae60; padding-bottom: 8px;">
-                        💰 Savings Summary</h3>
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f8f9fa; border-radius: 6px;">
-                            <span style="color: #666; font-size: 0.85em; font-weight: 600;">💰 Interest Saved</span>
-                            <span id="interestSaved"
-                                style="color: #27ae60; font-size: 1.1em; font-weight: 700;">₹0.00</span>
+                <div class="accordion-content">
+                    <div class="accordion-grid">
+                        <div class="accordion-item">
+                            <span class="accordion-label">💵 Loan Amount</span>
+                            <span class="accordion-value value-primary" id="summaryLoanAmount">₹0.00</span>
                         </div>
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f8f9fa; border-radius: 6px;">
-                            <span style="color: #666; font-size: 0.85em; font-weight: 600;">⏱️ Time Saved</span>
-                            <span id="timeSaved" style="color: #e74c3c; font-size: 1.1em; font-weight: 700;">0</span>
+                        <div class="accordion-item">
+                            <span class="accordion-label">📅 Tenure</span>
+                            <span class="accordion-value value-info" id="summaryTenure">0</span>
                         </div>
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f8f9fa; border-radius: 6px;">
-                            <span style="color: #666; font-size: 0.85em; font-weight: 600;">💵 Total Pre-payment</span>
-                            <span id="totalPrepayment"
-                                style="color: #f39c12; font-size: 1.1em; font-weight: 700;">₹0.00</span>
+                        <div class="accordion-item">
+                            <span class="accordion-label">💰 Total Interest</span>
+                            <span class="accordion-value value-danger" id="summaryTotalInterest">₹0.00</span>
                         </div>
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f8f9fa; border-radius: 6px;">
-                            <span style="color: #666; font-size: 0.85em; font-weight: 600;">📅 Remaining Tenure</span>
-                            <span id="remainingTenure"
-                                style="color: #667eea; font-size: 1.1em; font-weight: 700;">0</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Column 3: Payment Details -->
-                <div
-                    style="background: rgba(255,255,255,0.95); padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);">
-                    <h3
-                        style="margin-bottom: 12px; color: #333; font-size: 1.1em; border-bottom: 2px solid #f39c12; padding-bottom: 8px;">
-                        💳 Payment Details</h3>
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f8f9fa; border-radius: 6px;">
-                            <span style="color: #666; font-size: 0.85em; font-weight: 600;">💰 Interest Paid</span>
-                            <span id="totalInterestPaid"
-                                style="color: #e74c3c; font-size: 1.1em; font-weight: 700;">₹0.00</span>
-                        </div>
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f8f9fa; border-radius: 6px;">
-                            <span style="color: #666; font-size: 0.85em; font-weight: 600;">💵 Principal Paid</span>
-                            <span id="totalPrincipalPaid"
-                                style="color: #667eea; font-size: 1.1em; font-weight: 700;">₹0.00</span>
-                        </div>
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f8f9fa; border-radius: 6px;">
-                            <span style="color: #666; font-size: 0.85em; font-weight: 600;">💳 Total EMI Paid</span>
-                            <span id="totalEmiPaid"
-                                style="color: #f39c12; font-size: 1.1em; font-weight: 700;">₹0.00</span>
-                        </div>
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: #f8f9fa; border-radius: 6px;">
-                            <span style="color: #666; font-size: 0.85em; font-weight: 600;">📊 Other Charges</span>
-                            <span id="totalOtherCharges"
-                                style="color: #9b59b6; font-size: 1.1em; font-weight: 700;">₹0.00</span>
+                        <div class="accordion-item">
+                            <span class="accordion-label">💳 Total Amount</span>
+                            <span class="accordion-value value-warning" id="summaryTotalAmount">₹0.00</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Additional Details Row (Less Important Metrics) -->
-            <div
-                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 15px;">
-                <div
-                    style="background: rgba(255,255,255,0.9); padding: 10px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06); display: flex; justify-content: space-between; align-items: center;">
-                    <span style="color: #666; font-size: 0.8em; font-weight: 600;">📅 Prepayment Months</span>
-                    <!-- CHANGED: Keep original prepayment link functionality -->
-                    <span id="prepaymentMonths" class="prepayment-link" onclick="showPrepaymentDetailsPage()"
-                        style="color: #2ecc71; font-size: 1em; font-weight: 700;">0</span>
+            <!-- Savings Summary Section -->
+            <div class="accordion-section savings-summary-section">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span>💰</span>
+                        <span>Savings Summary</span>
+                    </div>
+                    <svg class="accordion-icon chevron-icon" viewBox="0 0 24 24">
+                        <path d="M6 9l6 6 6-6" />
+                    </svg>
                 </div>
-                <div
-                    style="background: rgba(255,255,255,0.9); padding: 10px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06); display: flex; justify-content: space-between; align-items: center;">
-                    <span style="color: #666; font-size: 0.8em; font-weight: 600;">📊 Other Charges Months</span>
-                    <!-- CHANGED: Keep original charges link functionality -->
-                    <span id="chargesMonths" class="charges-link" onclick="showChargesDetailsPage()"
-                        style="color: #9b59b6; font-size: 1em; font-weight: 700;">0</span>
-                </div>
-                <div
-                    style="background: rgba(255,255,255,0.9); padding: 10px 15px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06); display: flex; justify-content: space-between; align-items: center;">
-                    <span style="color: #666; font-size: 0.8em; font-weight: 600;">💎 New Total Interest</span>
-                    <span id="newTotalInterest" style="color: #8e44ad; font-size: 1em; font-weight: 700;">₹0.00</span>
+                <div class="accordion-content">
+                    <div class="accordion-grid">
+                        <div class="accordion-item">
+                            <span class="accordion-label">💰 Interest Saved</span>
+                            <span class="accordion-value value-success" id="interestSaved">₹0.00</span>
+                        </div>
+                        <div class="accordion-item">
+                            <span class="accordion-label">⏱️ Time Saved</span>
+                            <span class="accordion-value value-danger" id="timeSaved">0</span>
+                        </div>
+                        <div class="accordion-item">
+                            <span class="accordion-label">💵 Total Pre-payment</span>
+                            <span class="accordion-value value-warning" id="totalPrepayment">₹0.00</span>
+                        </div>
+                        <div class="accordion-item">
+                            <span class="accordion-label">📅 Remaining Tenure</span>
+                            <span class="accordion-value value-primary" id="remainingTenure">0</span>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <!-- Payment Details Section -->
+            <div class="accordion-section payment-summary-section">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span>💳</span>
+                        <span>Payment Details</span>
+                    </div>
+                    <svg class="accordion-icon chevron-icon" viewBox="0 0 24 24">
+                        <path d="M6 9l6 6 6-6" />
+                    </svg>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-grid">
+                        <div class="accordion-item">
+                            <span class="accordion-label">💰 Interest Paid</span>
+                            <span class="accordion-value value-danger" id="totalInterestPaid">₹0.00</span>
+                        </div>
+                        <div class="accordion-item">
+                            <span class="accordion-label">💵 Principal Paid</span>
+                            <span class="accordion-value value-primary" id="totalPrincipalPaid">₹0.00</span>
+                        </div>
+                        <div class="accordion-item">
+                            <span class="accordion-label">💳 Total EMI Paid</span>
+                            <span class="accordion-value value-warning" id="totalEmiPaid">₹0.00</span>
+                        </div>
+                        <div class="accordion-item">
+                            <span class="accordion-label">📊 Other Charges</span>
+                            <span class="accordion-value value-purple" id="totalOtherCharges">₹0.00</span>
+                        </div>
+                    </div>
+
+                    <!-- Additional Details (Less Important Metrics) -->
+                    <div class="additional-details">
+                        <div class="additional-item">
+                            <span class="additional-label">📅 Prepayment Months</span>
+                            <span id="prepaymentMonths" class="prepayment-link" onclick="showPrepaymentDetailsPage()"
+                                style="color: #2ecc71; font-size: 1em; font-weight: 700;">0</span>
+                        </div>
+                        <div class="additional-item">
+                            <span class="additional-label">📊 Other Charges Months</span>
+                            <span id="chargesMonths" class="charges-link" onclick="showChargesDetailsPage()"
+                                style="color: #9b59b6; font-size: 1em; font-weight: 700;">0</span>
+                        </div>
+                        <div class="additional-item">
+                            <span class="additional-label">💎 New Total Interest</span>
+                            <span class="additional-value value-info" id="newTotalInterest">₹0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
-
     <!-- Amortization Table Container -->
     <div id="amortizationTableContainer" style="display: none;">
         <div class="year-filter-container" id="yearFilterContainer" style="display: none;">
@@ -670,6 +664,7 @@
     <script src="js/pages-manager.js"></script>
     <script src="js/draggable.js"></script>
     <script src="js/loan-management.js"></script>
+    <script src="js/accordion-manager.js"></script>
     <script src="js/main.js"></script>
 
 </body>
