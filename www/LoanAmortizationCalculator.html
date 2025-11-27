@@ -17,10 +17,56 @@
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="css/enhancement.css">
     <link rel="stylesheet" href="css/draggable.css">
+    <link rel="stylesheet" href="css/navigationbar.css">
+
+    <style>
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: flex !important;
+            }
+        }
+    </style>
 
 </head>
 
 <body>
+    <!-- Mobile Menu Button (visible only on mobile) -->
+    <button class="mobile-menu-btn" onclick="toggleSidebar()" style="display: none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12h18M3 6h18M3 18h18"></path>
+        </svg>
+    </button>
+
+    <!-- Sidebar Overlay (for mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Left Sidebar Navigation -->
+    <div class="loan-sidebar" id="loanSidebar">
+        <div class="sidebar-header">
+            <h2>My Loans</h2>
+            <button class="sidebar-toggle-btn" onclick="toggleSidebar()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 18l-6-6 6-6"></path>
+                </svg>
+            </button>
+        </div>
+
+        <div class="create-loan-section">
+            <button class="create-loan-btn" onclick="showCreateLoanModal()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"></path>
+                </svg>
+                Create New Loan
+            </button>
+        </div>
+
+        <div class="loans-list">
+            <div class="loans-list-header">Your Loans</div>
+            <div id="loansList">
+                <!-- Loan items will be populated here by JavaScript -->
+            </div>
+        </div>
+    </div>
 
     <!-- Full-width Loan Inputs Banner -->
     <div class="loan-inputs-banner">
@@ -562,6 +608,56 @@
         </div>
     </div>
 
+    <!-- Create/Edit Loan Modal -->
+    <div class="loan-modal-overlay" id="loanModal">
+        <div class="loan-modal">
+            <div class="loan-modal-header">
+                <h3 id="loanModalTitle">Create New Loan</h3>
+            </div>
+            <div class="loan-modal-body">
+                <div class="loan-form-group">
+                    <label for="loanNameInput">Loan Name *</label>
+                    <input type="text" id="loanNameInput" placeholder="e.g., Home Loan, Car Loan" required>
+                </div>
+                <div class="loan-form-group">
+                    <label for="loanTypeSelect">Loan Type *</label>
+                    <select id="loanTypeSelect" required>
+                        <option value="">Select loan type</option>
+                        <option value="home">Home Loan</option>
+                        <option value="car">Car Loan</option>
+                        <option value="personal">Personal Loan</option>
+                        <option value="education">Education Loan</option>
+                        <option value="business">Business Loan</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+            <div class="loan-modal-footer">
+                <button class="loan-modal-btn loan-modal-btn-secondary" onclick="closeLoanModal()">Cancel</button>
+                <button class="loan-modal-btn loan-modal-btn-primary" onclick="saveLoanFromModal()">Save Loan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Loan Confirmation Modal -->
+    <div class="loan-modal-overlay" id="deleteLoanModal">
+        <div class="loan-modal">
+            <div class="loan-modal-header">
+                <h3>Delete Loan</h3>
+            </div>
+            <div class="loan-modal-body">
+                <p class="delete-loan-message">
+                    Are you sure you want to delete <span class="delete-loan-name" id="deleteLoanName"></span>?
+                    All data associated with this loan will be permanently deleted.
+                </p>
+            </div>
+            <div class="loan-modal-footer">
+                <button class="loan-modal-btn loan-modal-btn-secondary" onclick="closeDeleteLoanModal()">Cancel</button>
+                <button class="loan-modal-btn loan-modal-btn-danger" onclick="confirmDeleteLoan()">Delete</button>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript Files -->
     <script src="cordova.js"></script>
     <script src="js/storage-manager.js"></script>
@@ -573,6 +669,7 @@
     <script src="js/savings-calculator.js"></script>
     <script src="js/pages-manager.js"></script>
     <script src="js/draggable.js"></script>
+    <script src="js/loan-management.js"></script>
     <script src="js/main.js"></script>
 
 </body>

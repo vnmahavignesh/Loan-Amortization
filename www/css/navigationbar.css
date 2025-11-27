@@ -1,0 +1,515 @@
+/* navigation.css - Multi-Loan Sidebar Navigation Styles */
+
+/* Sidebar Container */
+.loan-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 280px;
+    background: white;
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.loan-sidebar.minimized {
+    transform: translateX(-240px);
+}
+
+/* Sidebar Header */
+.sidebar-header {
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.sidebar-header h2 {
+    font-size: 1.2em;
+    margin: 0;
+}
+
+.sidebar-toggle-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.sidebar-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.sidebar-toggle-btn svg {
+    transition: transform 0.3s;
+}
+
+.loan-sidebar.minimized .sidebar-toggle-btn svg {
+    transform: rotate(180deg);
+}
+
+/* Create Loan Section */
+.create-loan-section {
+    padding: 20px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.create-loan-btn {
+    width: 100%;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s;
+}
+
+.create-loan-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+.create-loan-btn:active {
+    transform: translateY(0);
+}
+
+/* Loans List */
+.loans-list {
+    padding: 10px;
+}
+
+.loans-list-header {
+    padding: 10px;
+    font-weight: 600;
+    color: #666;
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.empty-loans-state {
+    text-align: center;
+    padding: 30px 20px;
+    color: #999;
+    font-size: 0.9em;
+}
+
+/* Loan Item */
+.loan-item {
+    padding: 12px 15px;
+    margin: 5px 0;
+    background: #f8f9fa;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.loan-item:hover {
+    background: #e3f2fd;
+    transform: translateX(5px);
+}
+
+.loan-item.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.loan-item-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.loan-item-name {
+    font-weight: 600;
+    font-size: 1em;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.loan-item-type {
+    font-size: 0.85em;
+    opacity: 0.8;
+}
+
+.loan-item-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.loan-action-btn {
+    background: rgba(0, 0, 0, 0.1);
+    border: none;
+    padding: 6px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: inherit;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loan-action-btn:hover {
+    background: rgba(0, 0, 0, 0.2);
+    transform: scale(1.1);
+}
+
+.loan-item.active .loan-action-btn {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.loan-item.active .loan-action-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Main Content Area */
+body {
+    margin-left: 280px;
+    transition: margin-left 0.3s ease;
+}
+
+/* When sidebar is minimized */
+body:has(.loan-sidebar.minimized) {
+    margin-left: 40px;
+}
+
+/* Legacy class support */
+.main-content {
+    margin-left: 0;
+    transition: none;
+    min-height: 100vh;
+}
+
+.main-content.expanded {
+    margin-left: 0;
+}
+
+/* Current Loan Header */
+#currentLoanHeader {
+    padding: 15px 0;
+}
+
+/* Modal Overlay */
+.loan-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 20px;
+}
+
+.loan-modal-overlay.show {
+    display: flex;
+}
+
+/* Modal */
+.loan-modal {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.loan-modal-header {
+    margin-bottom: 20px;
+}
+
+.loan-modal-header h3 {
+    color: #333;
+    font-size: 1.5em;
+    margin: 0;
+}
+
+.loan-modal-body {
+    margin-bottom: 20px;
+}
+
+.loan-form-group {
+    margin-bottom: 15px;
+}
+
+.loan-form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95em;
+}
+
+.loan-form-group input,
+.loan-form-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1em;
+    transition: border 0.3s;
+    font-family: inherit;
+}
+
+.loan-form-group input:focus,
+.loan-form-group select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.loan-modal-footer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.loan-modal-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.loan-modal-btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.loan-modal-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.loan-modal-btn-secondary {
+    background: #e0e0e0;
+    color: #333;
+}
+
+.loan-modal-btn-secondary:hover {
+    background: #d0d0d0;
+}
+
+.loan-modal-btn-danger {
+    background: linear-gradient(135deg, #ef5350 0%, #e53935 100%);
+    color: white;
+}
+
+.loan-modal-btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(239, 83, 80, 0.4);
+}
+
+/* Delete Modal Specific */
+.delete-loan-message {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.delete-loan-name {
+    font-weight: 700;
+    color: #e53935;
+}
+
+/* Sidebar Overlay for Mobile */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    display: none;
+}
+
+.sidebar-overlay.show {
+    display: block;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+
+    body {
+        margin-left: 0 !important;
+    }
+
+    .loan-sidebar {
+        width: 85%;
+        max-width: 320px;
+        transform: translateX(-100%);
+    }
+
+    .loan-sidebar.minimized {
+        transform: translateX(-100%);
+    }
+
+    .loan-sidebar:not(.minimized) {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    .main-content.expanded {
+        margin-left: 0;
+    }
+
+    /* Mobile toggle button (hamburger menu) */
+    .mobile-menu-btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 998;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s;
+    }
+
+    .mobile-menu-btn:hover {
+        transform: scale(1.1);
+    }
+
+    .mobile-menu-btn svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .loan-modal {
+        padding: 20px;
+        max-width: 95%;
+    }
+
+    .loan-modal-footer {
+        flex-direction: column;
+    }
+
+    .loan-modal-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar-header {
+        padding: 15px;
+    }
+
+    .sidebar-header h2 {
+        font-size: 1em;
+    }
+
+    .create-loan-section {
+        padding: 15px;
+    }
+
+    .create-loan-btn {
+        padding: 12px 16px;
+        font-size: 0.95em;
+    }
+
+    .loan-item {
+        padding: 10px 12px;
+    }
+
+    .loan-item-name {
+        font-size: 0.95em;
+    }
+
+    .loan-item-type {
+        font-size: 0.8em;
+    }
+
+    .loan-action-btn {
+        padding: 5px 6px;
+    }
+
+    .loan-action-btn svg {
+        width: 14px;
+        height: 14px;
+    }
+}
+
+/* Animation for loan item addition */
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.loan-item {
+    animation: slideInFromLeft 0.3s ease-out;
+}
+
+/* Scrollbar styling for sidebar */
+.loan-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.loan-sidebar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.loan-sidebar::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.loan-sidebar::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
