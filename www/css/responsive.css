@@ -1,0 +1,160 @@
+/* Responsive styles for mobile devices */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    .loan-inputs-banner {
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 1.8em;
+    }
+
+    .input-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .button-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .generate-btn,
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .year-filter-container {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .year-filter-controls {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .table-container {
+        overflow-x: auto;
+        font-size: 0.8em;
+    }
+
+    th,
+    td {
+        padding: 8px 5px;
+    }
+
+    .payment-details-header,
+    .prepayment-details-header,
+    .charges-details-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .prepayment-manager,
+    .charges-manager {
+        width: 95%;
+        padding: 15px;
+    }
+
+    .add-prepayment-form,
+    .add-charges-form {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .edit-form-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    /* Summary section responsive */
+    .outer-summary>div>div {
+        grid-template-columns: 1fr;
+    }
+
+    /* Status indicators */
+    .unsaved-indicator,
+    .save-status {
+        font-size: 0.9em;
+        padding: 10px 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.5em;
+    }
+
+    .input-field {
+        padding: 12px 15px;
+        font-size: 1em;
+    }
+
+    .button-container {
+        gap: 8px;
+    }
+
+    .btn {
+        padding: 10px 15px;
+        font-size: 0.9em;
+    }
+
+    .year-filter-select {
+        padding: 8px 15px;
+        font-size: 0.9em;
+    }
+
+    .table-container {
+        font-size: 0.7em;
+    }
+
+    th,
+    td {
+        padding: 6px 3px;
+    }
+
+    .rate-input {
+        width: 60px;
+        padding: 4px 6px;
+        font-size: 0.8em;
+    }
+}
+
+/* Print styles */
+@media print {
+    body {
+        background: white !important;
+        padding: 0;
+    }
+
+    .loan-inputs-banner {
+        background: white !important;
+        box-shadow: none !important;
+        margin-bottom: 10px;
+    }
+
+    .button-container {
+        display: none;
+    }
+
+    .year-filter-container {
+        display: none;
+    }
+
+    .table-container {
+        box-shadow: none !important;
+    }
+
+    .prepayment-manager,
+    .charges-manager,
+    .prepayment-manager-overlay,
+    .charges-manager-overlay {
+        display: none !important;
+    }
+}

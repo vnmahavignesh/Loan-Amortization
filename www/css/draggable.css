@@ -1,0 +1,304 @@
+/* Enhanced Modal Styles - Draggable and All-Sides Resizable */
+
+/* Prepayment Manager Modal */
+.prepayment-manager,
+.charges-manager {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    width: 700px;
+    min-width: 500px;
+    max-width: 90vw;
+    height: auto;
+    min-height: 400px;
+    max-height: 80vh;
+
+    /* Remove default resize - we'll handle it manually */
+    resize: none;
+    overflow: visible;
+}
+
+/* Modal content wrapper with scroll */
+.modal-content-wrapper {
+    max-height: calc(80vh - 50px);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Add a drag handle indicator to the header */
+.prepayment-manager-header,
+.charges-manager-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #667eea;
+    cursor: move;
+    /* Indicate this area is draggable */
+    user-select: none;
+    /* Prevent text selection while dragging */
+    position: relative;
+}
+
+/* Add visual feedback for dragging */
+.prepayment-manager.dragging,
+.charges-manager.dragging {
+    opacity: 0.9;
+}
+
+/* Resize handles for all sides */
+.resize-handle {
+    position: absolute;
+    z-index: 1001;
+}
+
+/* Top resize handle */
+.resize-handle-n {
+    top: -5px;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    cursor: ns-resize;
+}
+
+/* Bottom resize handle */
+.resize-handle-s {
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    cursor: ns-resize;
+}
+
+/* Left resize handle */
+.resize-handle-w {
+    top: 0;
+    left: -5px;
+    width: 10px;
+    height: 100%;
+    cursor: ew-resize;
+}
+
+/* Right resize handle */
+.resize-handle-e {
+    top: 0;
+    right: -5px;
+    width: 10px;
+    height: 100%;
+    cursor: ew-resize;
+}
+
+/* Top-left corner */
+.resize-handle-nw {
+    top: -5px;
+    left: -5px;
+    width: 15px;
+    height: 15px;
+    cursor: nw-resize;
+}
+
+/* Top-right corner */
+.resize-handle-ne {
+    top: -5px;
+    right: -5px;
+    width: 15px;
+    height: 15px;
+    cursor: ne-resize;
+}
+
+/* Bottom-left corner */
+.resize-handle-sw {
+    bottom: -5px;
+    left: -5px;
+    width: 15px;
+    height: 15px;
+    cursor: sw-resize;
+}
+
+/* Bottom-right corner */
+.resize-handle-se {
+    bottom: -5px;
+    right: -5px;
+    width: 15px;
+    height: 15px;
+    cursor: se-resize;
+}
+
+/* Visual indicators for resize handles (corners only - more visible) */
+.resize-handle-se::after,
+.resize-handle-sw::after,
+.resize-handle-ne::after,
+.resize-handle-nw::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #667eea;
+    opacity: 0.6;
+}
+
+.resize-handle-se::after {
+    bottom: 2px;
+    right: 2px;
+}
+
+.resize-handle-sw::after {
+    bottom: 2px;
+    left: 2px;
+}
+
+.resize-handle-ne::after {
+    top: 2px;
+    right: 2px;
+}
+
+.resize-handle-nw::after {
+    top: 2px;
+    left: 2px;
+}
+
+/* Hover effect for resize handles */
+.resize-handle:hover::after {
+    opacity: 1;
+    transform: scale(1.2);
+    transition: all 0.2s ease;
+}
+
+/* Edge resize handles - show on hover */
+.resize-handle-n::before,
+.resize-handle-s::before,
+.resize-handle-e::before,
+.resize-handle-w::before {
+    content: '';
+    position: absolute;
+    background: #667eea;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.resize-handle-n::before,
+.resize-handle-s::before {
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 3px;
+}
+
+.resize-handle-n::before {
+    top: 3px;
+}
+
+.resize-handle-s::before {
+    bottom: 3px;
+}
+
+.resize-handle-e::before,
+.resize-handle-w::before {
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 40px;
+}
+
+.resize-handle-e::before {
+    right: 3px;
+}
+
+.resize-handle-w::before {
+    left: 3px;
+}
+
+.resize-handle-n:hover::before,
+.resize-handle-s:hover::before,
+.resize-handle-e:hover::before,
+.resize-handle-w:hover::before {
+    opacity: 0.6;
+}
+
+.prepayment-manager-overlay,
+.charges-manager-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+.prepayment-manager.show,
+.charges-manager.show {
+    display: block;
+}
+
+.prepayment-manager-overlay.show,
+.charges-manager-overlay.show {
+    display: block;
+}
+
+/* Ensure content inside doesn't interfere with dragging */
+.prepayment-list,
+.charges-list {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    cursor: default;
+    /* Reset cursor inside content area */
+}
+
+.prepayment-summary,
+.charges-summary {
+    background: #e8f5e8;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: 600;
+    color: #27ae60;
+    cursor: default;
+}
+
+.add-prepayment-form,
+.add-charges-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 10px;
+    margin-bottom: 20px;
+    cursor: default;
+    /* Reset cursor in form area */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+
+    .prepayment-manager,
+    .charges-manager {
+        width: 95%;
+        min-width: unset;
+        max-width: unset;
+    }
+
+    /* Hide resize handles on mobile */
+    .resize-handle {
+        display: none;
+    }
+
+    .add-prepayment-form,
+    .add-charges-form {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+}

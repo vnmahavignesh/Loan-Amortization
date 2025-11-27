@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.yourcompany.loanapp" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>Loan Amortization Calculator</name>
+    <description>
+        A loan amortization calculator application
+    </description>
+    <author email="you@example.com" href="http://yourwebsite.com">
+        Your Name
+    </author>
+    
+    <content src="LoanAmortizationCalculator.html" />
+    
+    <access origin="*" />
+    
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    
+    <preference name="DisallowOverscroll" value="true" />
+    <preference name="android-minSdkVersion" value="22" />
+    <preference name="android-targetSdkVersion" value="35" />
+    
+    <!-- Android Platform -->
+    <platform name="android">
+        <allow-intent href="market:*" />
+        <preference name="AndroidInsecureFileModeEnabled" value="true" />
+    </platform>
+</widget>
