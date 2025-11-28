@@ -99,29 +99,22 @@ function renderLoansList() {
     `).join('');
 }
 
+
 /**
  * Toggle sidebar visibility
  */
 function toggleSidebar() {
     const sidebar = document.getElementById('loanSidebar');
-    const mainContent = document.getElementById('mainContent');
     const overlay = document.getElementById('sidebarOverlay');
 
-    if (sidebar) {
-        sidebar.classList.toggle('minimized');
+    sidebar.classList.toggle('minimized');
 
-        if (mainContent) {
-            mainContent.classList.toggle('expanded');
-        }
-
-        // On mobile, show/hide overlay
-        if (window.innerWidth <= 768 && overlay) {
-            if (sidebar.classList.contains('minimized')) {
-                overlay.classList.remove('show');
-            } else {
-                overlay.classList.add('show');
-            }
-        }
+    // For desktop: toggle body class to adjust margin
+    if (window.innerWidth > 768) {
+        document.body.classList.toggle('sidebar-minimized');
+    } else {
+        // For mobile: toggle overlay
+        overlay.classList.toggle('show');
     }
 }
 
