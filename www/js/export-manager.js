@@ -142,87 +142,126 @@ function downloadCSV(csv, filename) {
     }
 }
 
-// Save CSV using Cordova File Plugin (for Android/iOS app)
+// FIXED: Save CSV using Cordova File Plugin (for Android/iOS app)
 function saveCsvWithCordova(csv, filename) {
-    // Wait for deviceready event
-    const executeSave = function () {
-        try {
-            // Check if File plugin is available
-            if (!window.cordova.file) {
-                console.error('Cordova File plugin not available');
-                saveCsvWithBrowser(csv, filename); // Fallback to browser method
-                return;
-            }
+    console.log('Starting Cordova CSV save...');
 
-            // Determine the correct directory based on platform
-            let directory;
+    // Check if device is ready
+    if (document.readyState === 'complete' && window.cordova) {
+        executeCordovaSave(csv, filename);
+    } else {
+        document.addEventListener('deviceready', function () {
+            executeCordovaSave(csv, filename);
+        }, false);
+    }
+}
 
-            if (window.device && window.device.platform === 'Android') {
-                // For Android - use external storage Downloads folder
-                directory = cordova.file.externalRootDirectory + 'Download/';
-            } else if (window.device && window.device.platform === 'iOS') {
-                // For iOS - use documents directory
-                directory = cordova.file.documentsDirectory;
+function executeCordovaSave(csv, filename) {
+    try {
+        console.log('Executing Cordova save...');
+
+        // Check if File plugin is available
+        if (!window.cordova || !window.cordova.file) {
+            console.error('Cordova File plugin not available');
+            alert('⚠️ File plugin not available. Please install:\ncordova plugin add cordova-plugin-file');
+            saveCsvWithBrowser(csv, filename);
+            return;
+        }
+
+        // For Android - Use the correct directory
+        let directory;
+
+        if (window.device && window.device.platform === 'Android') {
+            // Android 10+ (API 29+) - Use app-specific external directory (no permissions needed)
+            // This is the safest option for modern Android
+            if (parseInt(window.device.version) >= 10) {
+                directory = cordova.file.externalDataDirectory;
+                console.log('Using external data directory for Android 10+:', directory);
             } else {
-                // Fallback
-                directory = cordova.file.dataDirectory || cordova.file.documentsDirectory;
+                // Android 9 and below - Use Downloads folder
+                directory = cordova.file.externalRootDirectory + 'Download/';
+                console.log('Using Downloads folder for Android 9 and below:', directory);
             }
+        } else if (window.device && window.device.platform === 'iOS') {
+            // iOS - use documents directory
+            directory = cordova.file.documentsDirectory;
+            console.log('Using documents directory for iOS:', directory);
+        } else {
+            // Fallback
+            directory = cordova.file.dataDirectory || cordova.file.externalDataDirectory;
+            console.log('Using fallback directory:', directory);
+        }
 
-            window.resolveLocalFileSystemURL(directory, function (dirEntry) {
-                dirEntry.getFile(filename, { create: true, exclusive: false }, function (fileEntry) {
-                    fileEntry.createWriter(function (fileWriter) {
-                        fileWriter.onwriteend = function () {
-                            console.log("CSV file saved successfully!");
+        console.log('Resolving directory:', directory);
 
-                            // Show success message with file location
-                            let location = 'Downloads';
-                            if (window.device) {
-                                location = window.device.platform === 'Android' ? 'Downloads' : 'Documents';
+        window.resolveLocalFileSystemURL(directory, function (dirEntry) {
+            console.log('Directory resolved successfully');
+
+            dirEntry.getFile(filename, { create: true, exclusive: false }, function (fileEntry) {
+                console.log('File entry created:', fileEntry.toURL());
+
+                fileEntry.createWriter(function (fileWriter) {
+                    console.log('File writer created');
+
+                    fileWriter.onwriteend = function () {
+                        console.log('CSV file written successfully!');
+
+                        let locationMsg = 'File saved successfully!\n\n';
+
+                        if (window.device && window.device.platform === 'Android') {
+                            if (parseInt(window.device.version) >= 10) {
+                                locationMsg += 'Location: App Data Folder\n';
+                                locationMsg += 'Path: Android/data/com.yourcompany.loanapp/files/\n\n';
+                                locationMsg += 'To access: Use a File Manager app and navigate to the path above.';
+                            } else {
+                                locationMsg += 'Location: Downloads Folder\n';
+                                locationMsg += 'You can find it in your Downloads folder.';
                             }
-                            alert(`✅ CSV file saved successfully!\n\nLocation: ${location}/${filename}`);
+                        } else if (window.device && window.device.platform === 'iOS') {
+                            locationMsg += 'Location: App Documents Folder\n';
+                            locationMsg += 'You can access it via Files app.';
+                        }
 
-                            // Optional: Try to open the file (Android only)
-                            if (window.device && window.device.platform === 'Android') {
-                                openCsvFile(fileEntry);
-                            }
-                        };
+                        locationMsg += `\n\nFilename: ${filename}`;
 
-                        fileWriter.onerror = function (e) {
-                            console.error("Failed to write file:", e);
-                            alert('❌ Error saving file. Trying browser method...');
-                            saveCsvWithBrowser(csv, filename);
-                        };
+                        alert('✅ ' + locationMsg);
 
-                        // Create a blob and write it
-                        const blob = new Blob([csv], { type: 'text/csv' });
-                        fileWriter.write(blob);
+                        // Try to open the file (Android only)
+                        if (window.device && window.device.platform === 'Android' && window.cordova.plugins && window.cordova.plugins.fileOpener2) {
+                            openCsvFile(fileEntry);
+                        }
+                    };
 
-                    }, function (error) {
-                        console.error("Failed to create file writer:", error);
-                        alert('❌ Error creating file. Trying browser method...');
+                    fileWriter.onerror = function (e) {
+                        console.error('Failed to write file:', e);
+                        alert('❌ Error saving file: ' + e.toString() + '\n\nTrying alternative method...');
                         saveCsvWithBrowser(csv, filename);
-                    });
+                    };
+
+                    // Create a blob and write it
+                    const blob = new Blob([csv], { type: 'text/csv' });
+                    fileWriter.write(blob);
+
                 }, function (error) {
-                    console.error("Failed to get file:", error);
-                    alert('❌ Error accessing file. Trying browser method...');
+                    console.error('Failed to create file writer:', error);
+                    alert('❌ Error creating file writer: ' + error.code + '\n\nTrying alternative method...');
                     saveCsvWithBrowser(csv, filename);
                 });
             }, function (error) {
-                console.error("Failed to resolve directory:", error);
-                alert('❌ Error accessing directory. Trying browser method...');
+                console.error('Failed to get file:', error);
+                alert('❌ Error accessing file: ' + error.code + '\n\nTrying alternative method...');
                 saveCsvWithBrowser(csv, filename);
             });
-        } catch (error) {
-            console.error("Cordova save error:", error);
+        }, function (error) {
+            console.error('Failed to resolve directory:', error);
+            alert('❌ Error accessing directory: ' + error.code + '\n\nTrying alternative method...');
             saveCsvWithBrowser(csv, filename);
-        }
-    };
+        });
 
-    // Check if device is already ready
-    if (document.readyState === 'complete' && window.cordova) {
-        executeSave();
-    } else {
-        document.addEventListener('deviceready', executeSave, false);
+    } catch (error) {
+        console.error('Cordova save error:', error);
+        alert('❌ Unexpected error: ' + error.toString() + '\n\nTrying alternative method...');
+        saveCsvWithBrowser(csv, filename);
     }
 }
 
@@ -324,7 +363,6 @@ function fallbackCopyToClipboard(csv, filename) {
 }
 
 // Show CSV content in modal (last resort)
-
 function showCSVModal(csv, filename) {
     const modal = document.createElement('div');
     modal.style.cssText = `

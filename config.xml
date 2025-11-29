@@ -5,7 +5,7 @@
         A loan amortization calculator application
     </description>
     <author email="you@example.com" href="http://yourwebsite.com">
-        Your Name
+        Maha Vignesh
     </author>
     
     <content src="LoanAmortizationCalculator.html" />
@@ -18,10 +18,13 @@
     <preference name="DisallowOverscroll" value="true" />
     <preference name="android-minSdkVersion" value="22" />
     <preference name="android-targetSdkVersion" value="35" />
+    <!-- File Storage Preference - Use Internal for modern Android -->
+    <preference name="AndroidPersistentFileLocation" value="Internal" />
     
     <!-- Android Platform -->
     <platform name="android">
         <allow-intent href="market:*" />
         <preference name="AndroidInsecureFileModeEnabled" value="true" />
+        
     </platform>
 </widget>
