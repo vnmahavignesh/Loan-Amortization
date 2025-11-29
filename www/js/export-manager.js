@@ -324,6 +324,7 @@ function fallbackCopyToClipboard(csv, filename) {
 }
 
 // Show CSV content in modal (last resort)
+
 function showCSVModal(csv, filename) {
     const modal = document.createElement('div');
     modal.style.cssText = `
