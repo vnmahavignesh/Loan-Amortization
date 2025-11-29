@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="css/draggable.css">
     <link rel="stylesheet" href="css/navigationbar.css">
     <link rel="stylesheet" href="css/accordion.css">
+    <link rel="stylesheet" href="css/splash-screen.css">
 
     <style>
         @media (max-width: 768px) {
@@ -31,6 +32,23 @@
 </head>
 
 <body>
+
+    <!-- Splash Screen -->
+    <div class="splash-screen" id="splashScreen">
+        <div class="splash-content">
+            <div class="splash-icon">💰</div>
+            <h1 class="splash-title">Loan Amortization Calculator</h1>
+            <p class="splash-subtitle">Your Financial Planning Companion</p>
+            <div class="loading-container">
+                <span class="loading-text">Loading Calculator</span>
+                <div class="loading-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="app">
         <div id="deviceready" class="blink">
             <p class="event listening">Dev by Maha Vignesh</p>
@@ -665,6 +683,7 @@
     <script src="js/draggable.js"></script>
     <script src="js/loan-management.js"></script>
     <script src="js/accordion-manager.js"></script>
+    <script src="js/splash-screen.js"></script>
     <script src="js/main.js"></script>
 
 </body>
