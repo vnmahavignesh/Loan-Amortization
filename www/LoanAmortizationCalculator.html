@@ -636,55 +636,64 @@
                     <select id="loanTypeSelect" required>
                         <option value="">Select loan type</option>
                         <option value="home">Home Loan</option>
-                        <option value="car">Car Loan</option>
+                        <option value="payday">Plot Loan</option>
+                        <option value="gold">Gold Loan</option>
                         <option value="personal">Personal Loan</option>
                         <option value="education">Education Loan</option>
+                        <option value="mortgage">Mortgage Loan</option>
+                        <option value="car">Car Loan</option>
                         <option value="business">Business Loan</option>
                         <option value="other">Other</option>
                     </select>
                 </div>
-            </div>
-            <div class="loan-modal-footer">
-                <button class="loan-modal-btn loan-modal-btn-secondary" onclick="closeLoanModal()">Cancel</button>
-                <button class="loan-modal-btn loan-modal-btn-primary" onclick="saveLoanFromModal()">Save Loan</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Delete Loan Confirmation Modal -->
-    <div class="loan-modal-overlay" id="deleteLoanModal">
-        <div class="loan-modal">
-            <div class="loan-modal-header">
-                <h3>Delete Loan</h3>
-            </div>
-            <div class="loan-modal-body">
-                <p class="delete-loan-message">
-                    Are you sure you want to delete <span class="delete-loan-name" id="deleteLoanName"></span>?
-                    All data associated with this loan will be permanently deleted.
-                </p>
-            </div>
-            <div class="loan-modal-footer">
-                <button class="loan-modal-btn loan-modal-btn-secondary" onclick="closeDeleteLoanModal()">Cancel</button>
-                <button class="loan-modal-btn loan-modal-btn-danger" onclick="confirmDeleteLoan()">Delete</button>
+                <!-- If user selects 'other' option, show an additional input field to specify custom loan type. -->
+                <div class="loan-form-group" id="customLoanTypeGroup" style="display: none;">
+                    <label for="customLoanTypeInput">Custom Loan Type *</label>
+                    <input type="text" id="customLoanTypeInput" placeholder="Specify custom loan type">
+                </div>
+                <div class="loan-modal-footer">
+                    <button class="loan-modal-btn loan-modal-btn-secondary" onclick="closeLoanModal()">Cancel</button>
+                    <button class="loan-modal-btn loan-modal-btn-primary" onclick="saveLoanFromModal()">Save
+                        Loan</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- JavaScript Files -->
-    <script src="cordova.js"></script>
-    <script src="js/storage-manager.js"></script>
-    <script src="js/calculator.js"></script>
-    <script src="js/table-manager.js"></script>
-    <script src="js/prepayment-manager.js"></script>
-    <script src="js/charges-manager.js"></script>
-    <script src="js/export-manager.js"></script>
-    <script src="js/savings-calculator.js"></script>
-    <script src="js/pages-manager.js"></script>
-    <script src="js/draggable.js"></script>
-    <script src="js/loan-management.js"></script>
-    <script src="js/accordion-manager.js"></script>
-    <script src="js/splash-screen.js"></script>
-    <script src="js/main.js"></script>
+        <!-- Delete Loan Confirmation Modal -->
+        <div class="loan-modal-overlay" id="deleteLoanModal">
+            <div class="loan-modal">
+                <div class="loan-modal-header">
+                    <h3>Delete Loan</h3>
+                </div>
+                <div class="loan-modal-body">
+                    <p class="delete-loan-message">
+                        Are you sure you want to delete <span class="delete-loan-name" id="deleteLoanName"></span>?
+                        All data associated with this loan will be permanently deleted.
+                    </p>
+                </div>
+                <div class="loan-modal-footer">
+                    <button class="loan-modal-btn loan-modal-btn-secondary"
+                        onclick="closeDeleteLoanModal()">Cancel</button>
+                    <button class="loan-modal-btn loan-modal-btn-danger" onclick="confirmDeleteLoan()">Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- JavaScript Files -->
+        <script src="cordova.js"></script>
+        <script src="js/storage-manager.js"></script>
+        <script src="js/calculator.js"></script>
+        <script src="js/table-manager.js"></script>
+        <script src="js/prepayment-manager.js"></script>
+        <script src="js/charges-manager.js"></script>
+        <script src="js/export-manager.js"></script>
+        <script src="js/savings-calculator.js"></script>
+        <script src="js/pages-manager.js"></script>
+        <script src="js/draggable.js"></script>
+        <script src="js/loan-management.js"></script>
+        <script src="js/accordion-manager.js"></script>
+        <script src="js/splash-screen.js"></script>
+        <script src="js/main.js"></script>
 
 </body>
 

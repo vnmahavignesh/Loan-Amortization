@@ -75,7 +75,7 @@ function renderLoansList() {
              data-loan-id="${loan.id}">
             <div class="loan-item-content">
                 <div class="loan-item-name">${escapeHtml(loan.name)}</div>
-                <div class="loan-item-type">${getLoanTypeLabel(loan.type)}</div>
+                <div class="loan-item-type">Type - ${getLoanTypeLabel(loan.type)}</div>
             </div>
             <div class="loan-item-actions">
                 <button class="loan-action-btn" 
@@ -144,10 +144,14 @@ function showCreateLoanModal() {
     const modalTitle = document.getElementById('loanModalTitle');
     const loanNameInput = document.getElementById('loanNameInput');
     const loanTypeSelect = document.getElementById('loanTypeSelect');
+    const customLoanTypeGroup = document.getElementById('customLoanTypeGroup');
+    const customLoanTypeInput = document.getElementById('customLoanTypeInput');
 
     if (modalTitle) modalTitle.textContent = 'Create New Loan';
     if (loanNameInput) loanNameInput.value = '';
     if (loanTypeSelect) loanTypeSelect.value = '';
+    if (customLoanTypeGroup) customLoanTypeGroup.style.display = 'none';
+    if (customLoanTypeInput) customLoanTypeInput.value = '';
 
     if (modal) {
         modal.classList.add('show');
@@ -167,10 +171,23 @@ function editLoan(loanId) {
     const modalTitle = document.getElementById('loanModalTitle');
     const loanNameInput = document.getElementById('loanNameInput');
     const loanTypeSelect = document.getElementById('loanTypeSelect');
+    const customLoanTypeGroup = document.getElementById('customLoanTypeGroup');
+    const customLoanTypeInput = document.getElementById('customLoanTypeInput');
 
     if (modalTitle) modalTitle.textContent = 'Edit Loan';
     if (loanNameInput) loanNameInput.value = loan.name;
     if (loanTypeSelect) loanTypeSelect.value = loan.type;
+
+    // Show custom loan type input if editing a loan with type 'other' and set value
+    if (customLoanTypeGroup && customLoanTypeInput) {
+        if (loan.type === 'other' && loan.customType) {
+            customLoanTypeGroup.style.display = '';
+            customLoanTypeInput.value = loan.customType;
+        } else {
+            customLoanTypeGroup.style.display = 'none';
+            customLoanTypeInput.value = '';
+        }
+    }
 
     if (modal) {
         modal.classList.add('show');
@@ -194,11 +211,13 @@ function closeLoanModal() {
 function saveLoanFromModal() {
     const loanNameInput = document.getElementById('loanNameInput');
     const loanTypeSelect = document.getElementById('loanTypeSelect');
+    const customLoanTypeInput = document.getElementById('customLoanTypeInput');
 
     const name = loanNameInput ? loanNameInput.value.trim() : '';
     const type = loanTypeSelect ? loanTypeSelect.value : '';
+    const customType = (type === 'other' && customLoanTypeInput) ? customLoanTypeInput.value.trim() : '';
 
-    if (!name || !type) {
+    if (!name || !type || (type === 'other' && !customType)) {
         alert('Please fill in all required fields');
         return;
     }
@@ -209,6 +228,7 @@ function saveLoanFromModal() {
         if (loan) {
             loan.name = name;
             loan.type = type;
+            loan.customType = (type === 'other') ? customType : undefined;
             loan.updatedAt = new Date().toISOString();
         }
     } else {
@@ -217,6 +237,7 @@ function saveLoanFromModal() {
             id: 'loan_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
             name: name,
             type: type,
+            customType: (type === 'other') ? customType : undefined,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
         };
@@ -527,10 +548,17 @@ function updateLoanHeader(loan) {
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
                 <h2 style="color: #667eea; margin: 0;">${escapeHtml(loan.name)}</h2>
                 <span style="background: #e3f2fd; color: #667eea; padding: 4px 12px; border-radius: 12px; font-size: 0.85em; font-weight: 600;">
-                    ${getLoanTypeLabel(loan.type)}
+                    Type: ${getLoanTypeLabel(loan.type)}
                 </span>
             </div>
         `;
+    }
+    // Also update the main heading area
+    const mainHeading = document.querySelector('.loan-inputs-banner h1');
+    const subHeading = document.querySelector('.loan-inputs-banner .section-subtitle');
+    if (mainHeading && subHeading && loan) {
+        mainHeading.innerHTML = `💰 Loan Amortization Calculator`;
+        subHeading.innerHTML = `📝 Loan Details<br><span style='color:#667eea;font-size:1em;'>${escapeHtml(loan.name)} | Type - ${getLoanTypeLabel(loan.type)}</span>`;
     }
 }
 
@@ -540,12 +568,23 @@ function updateLoanHeader(loan) {
 function getLoanTypeLabel(type) {
     const labels = {
         'home': 'Home Loan',
-        'car': 'Car Loan',
+        'payday': 'Plot Loan',
+        'gold': 'Gold Loan',
         'personal': 'Personal Loan',
         'education': 'Education Loan',
+        'mortgage': 'Mortgage Loan',
+        'car': 'Car Loan',
         'business': 'Business Loan',
         'other': 'Other'
     };
+    if (type === 'other') {
+        // Try to get custom type from current loan
+        const loan = loans.find(l => l.id === currentLoanId);
+        if (loan && loan.customType) {
+            return escapeHtml(loan.customType);
+        }
+        return 'Other';
+    }
     return labels[type] || type;
 }
 
@@ -572,6 +611,19 @@ function attachLoanManagementListeners() {
     const sidebarOverlay = document.getElementById('sidebarOverlay');
     if (sidebarOverlay) {
         sidebarOverlay.addEventListener('click', closeSidebarOnMobile);
+    }
+
+    // Show/hide custom loan type input based on selection
+    const loanTypeSelect = document.getElementById('loanTypeSelect');
+    const customLoanTypeGroup = document.getElementById('customLoanTypeGroup');
+    if (loanTypeSelect && customLoanTypeGroup) {
+        loanTypeSelect.addEventListener('change', function () {
+            if (loanTypeSelect.value === 'other') {
+                customLoanTypeGroup.style.display = '';
+            } else {
+                customLoanTypeGroup.style.display = 'none';
+            }
+        });
     }
 
     // Save loan data when switching away or closing
