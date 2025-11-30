@@ -194,6 +194,8 @@ function editLoan(loanId) {
     }
 }
 
+
+
 /**
  * Close loan modal
  */
@@ -249,8 +251,19 @@ function saveLoanFromModal() {
 
     saveAllLoans();
     renderLoansList();
+    // Update header if editing current loan
+    if (editingLoanId && editingLoanId === currentLoanId) {
+        const updatedLoan = loans.find(l => l.id === editingLoanId);
+        if (updatedLoan) updateLoanHeader(updatedLoan);
+    } else if (!editingLoanId) {
+        // If new loan was created and switched to, update header
+        const newLoan = loans[loans.length - 1];
+        if (newLoan && newLoan.id === currentLoanId) updateLoanHeader(newLoan);
+    }
     closeLoanModal();
 }
+
+
 
 /**
  * Show delete loan confirmation modal
@@ -558,7 +571,7 @@ function updateLoanHeader(loan) {
             <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
                 <h2 style="color: #667eea; margin: 0;">${escapeHtml(loan.name)}</h2>
                 <span style="background: #e3f2fd; color: #667eea; padding: 4px 12px; border-radius: 12px; font-size: 0.85em; font-weight: 600;">
-                    Type: ${getLoanTypeLabel(loan.type)}
+                    Type: ${getLoanTypeLabel(loan.type, loan.customType)}
                 </span>
             </div>
         `;
@@ -568,14 +581,14 @@ function updateLoanHeader(loan) {
     const subHeading = document.querySelector('.loan-inputs-banner .section-subtitle');
     if (mainHeading && subHeading && loan) {
         mainHeading.innerHTML = `💰 Loan Amortization Calculator`;
-        subHeading.innerHTML = `📝 Loan Details<br><span style='color:#667eea;font-size:1em;'>${escapeHtml(loan.name)} | Type - ${getLoanTypeLabel(loan.type)}</span>`;
+        subHeading.innerHTML = `📝 Loan Details<br><span style='color:#667eea;font-size:1em;'>${escapeHtml(loan.name)} | Type - ${getLoanTypeLabel(loan.type, loan.customType)}</span>`;
     }
 }
 
 /**
  * Get loan type label
  */
-function getLoanTypeLabel(type) {
+function getLoanTypeLabel(type, customType) {
     const labels = {
         'home': 'Home Loan',
         'payday': 'Plot Loan',
@@ -588,10 +601,8 @@ function getLoanTypeLabel(type) {
         'other': 'Other'
     };
     if (type === 'other') {
-        // Try to get custom type from current loan
-        const loan = loans.find(l => l.id === currentLoanId);
-        if (loan && loan.customType) {
-            return escapeHtml(loan.customType);
+        if (customType) {
+            return escapeHtml(customType);
         }
         return 'Other';
     }

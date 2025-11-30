@@ -2,7 +2,7 @@
 
 /**
  * Export complete amortization table with all loan details
- * Includes: Loan parameters, monthly schedule, prepayments, and charges
+ * Includes: Loan name, type, parameters, monthly schedule, prepayments, and charges
  */
 function exportAmortizationToCSV() {
     if (allTableRows.length === 0) {
@@ -16,8 +16,30 @@ function exportAmortizationToCSV() {
     const tenure = parseInt(document.getElementById('tenureInput').value) || 0;
     const emi = parseFloat(document.getElementById('emiInput').value) || 0;
 
-    // Start CSV with loan details header
-    let csv = '### LOAN DETAILS ###\n';
+    // Get loan name and type from current loan
+    let loanName = 'My Loan';
+    let loanType = 'personal';
+    let customLoanType = '';
+
+    if (currentLoanId && loans && loans.length > 0) {
+        const currentLoan = loans.find(l => l.id === currentLoanId);
+        if (currentLoan) {
+            loanName = currentLoan.name || 'My Loan';
+            loanType = currentLoan.type || 'personal';
+            customLoanType = currentLoan.customType || '';
+        }
+    }
+
+    // Escape loan name for CSV
+    const escapedLoanName = `"${loanName.replace(/"/g, '""')}"`;
+    const escapedCustomType = customLoanType ? `"${customLoanType.replace(/"/g, '""')}"` : '';
+
+    // Start CSV with loan identity and details header
+    let csv = '### LOAN IDENTITY ###\n';
+    csv += 'Loan Name,Loan Type,Custom Loan Type\n';
+    csv += `${escapedLoanName},${loanType},${escapedCustomType}\n\n`;
+
+    csv += '### LOAN DETAILS ###\n';
     csv += 'Loan Amount,Interest Rate (%),Total Tenure (months),Monthly EMI,Is EMI Auto Calculated\n';
     csv += `${loanAmount},${annualRate},${tenure},${emi},${isEMIAutoCalculated ? 'Yes' : 'No'}\n\n`;
 
@@ -111,11 +133,15 @@ function parseAndRestoreCompleteData(csvText) {
             return;
         }
 
-        // Find the loan details section
+        // Find sections
+        let loanIdentityIndex = -1;
         let loanDetailsIndex = -1;
         let monthlyScheduleIndex = -1;
 
         for (let i = 0; i < lines.length; i++) {
+            if (lines[i].includes('### LOAN IDENTITY ###')) {
+                loanIdentityIndex = i;
+            }
             if (lines[i].includes('### LOAN DETAILS ###')) {
                 loanDetailsIndex = i;
             }
@@ -124,12 +150,28 @@ function parseAndRestoreCompleteData(csvText) {
             }
         }
 
+        // Parse loan identity (name and type) - if available
+        let loanName = null;
+        let loanType = null;
+        let customLoanType = null;
+
+        if (loanIdentityIndex !== -1) {
+            const identityDataLine = lines[loanIdentityIndex + 2];
+            const identityValues = parseCSVLine(identityDataLine);
+
+            if (identityValues.length >= 2) {
+                loanName = identityValues[0] || null;
+                loanType = identityValues[1] || null;
+                customLoanType = identityValues[2] || null;
+            }
+        }
+
+        // Parse loan details
         if (loanDetailsIndex === -1 || monthlyScheduleIndex === -1) {
             alert('❌ Invalid CSV format. This does not appear to be a valid loan export file.');
             return;
         }
 
-        // Parse loan details (skip header line, get data line)
         const loanDataLine = lines[loanDetailsIndex + 2].split(',');
 
         if (loanDataLine.length < 4) {
@@ -244,16 +286,48 @@ function parseAndRestoreCompleteData(csvText) {
             return;
         }
 
-        // Confirm import
-        const confirmMsg = `Import complete loan data?\n\n` +
-            `📊 Loan Amount: ₹${formatIndianNumber(loanAmount.toFixed(2))}\n` +
+        // Build confirmation message
+        let confirmMsg = `Import complete loan data?\n\n`;
+
+        // Add loan identity if available
+        if (loanName) {
+            confirmMsg += `📋 Loan Name: ${loanName}\n`;
+            if (loanType === 'other' && customLoanType) {
+                confirmMsg += `📂 Loan Type: ${customLoanType}\n`;
+            } else {
+                const typeLabels = {
+                    'home': 'Home Loan',
+                    'payday': 'Plot Loan',
+                    'gold': 'Gold Loan',
+                    'personal': 'Personal Loan',
+                    'education': 'Education Loan',
+                    'mortgage': 'Mortgage Loan',
+                    'car': 'Car Loan',
+                    'business': 'Business Loan',
+                    'other': 'Other'
+                };
+                confirmMsg += `📂 Loan Type: ${typeLabels[loanType] || loanType}\n`;
+            }
+            confirmMsg += `\n`;
+        }
+
+        confirmMsg += `📊 Loan Amount: ₹${formatIndianNumber(loanAmount.toFixed(2))}\n` +
             `📈 Interest Rate: ${annualRate.toFixed(2)}% p.a.\n` +
             `📅 Tenure: ${tenure} months\n` +
             `💰 Monthly EMI: ₹${formatIndianNumber(emi.toFixed(2))}\n` +
             `📝 Monthly Records: ${monthlyRows.length}\n` +
             `💵 Prepayment Months: ${Object.keys(importedPrepaymentsData).length}\n` +
-            `📊 Charges Months: ${Object.keys(importedChargesData).length}\n\n` +
-            `⚠️ This will replace your current data.`;
+            `📊 Charges Months: ${Object.keys(importedChargesData).length}\n\n`;
+
+        // Check if importing into multi-loan system
+        if (typeof currentLoanId !== 'undefined' && currentLoanId) {
+            confirmMsg += `⚠️ This will update the current loan data.\n\n`;
+            confirmMsg += `Would you like to:\n`;
+            confirmMsg += `• OK - Update current loan\n`;
+            confirmMsg += `• Cancel - Create as new loan (use "Create New Loan" button first)`;
+        } else {
+            confirmMsg += `⚠️ This will replace your current data.`;
+        }
 
         if (!confirm(confirmMsg)) return;
 
@@ -280,12 +354,40 @@ function parseAndRestoreCompleteData(csvText) {
         // Small delay to show progress message
         setTimeout(() => {
             try {
+                // If loan name and type provided, update current loan info (if multi-loan system is active)
+                if (loanName && typeof currentLoanId !== 'undefined' && currentLoanId && typeof loans !== 'undefined' && loans.length > 0) {
+                    const currentLoan = loans.find(l => l.id === currentLoanId);
+                    if (currentLoan) {
+                        currentLoan.name = loanName;
+                        currentLoan.type = loanType || 'personal';
+                        if (loanType === 'other' && customLoanType) {
+                            currentLoan.customType = customLoanType;
+                        }
+                        currentLoan.updatedAt = new Date().toISOString();
+
+                        // Save updated loan info
+                        if (typeof saveAllLoans === 'function') {
+                            saveAllLoans();
+                        }
+
+                        // Update loan header
+                        if (typeof updateLoanHeader === 'function') {
+                            updateLoanHeader(currentLoan);
+                        }
+
+                        // Re-render loans list
+                        if (typeof renderLoansList === 'function') {
+                            renderLoansList();
+                        }
+                    }
+                }
+
                 // Clear existing data
                 clearCurrentLoanData();
 
                 // Set loan parameters
                 document.getElementById('loanAmountInput').value = Math.round(loanAmount);
-                document.getElementById('rateInput').value = annualRate.toFixed(2);
+                document.getElementById('rateInput').value = annualRate;
                 document.getElementById('tenureInput').value = tenure;
                 document.getElementById('emiInput').value = Math.round(emi);
 
@@ -314,7 +416,7 @@ function parseAndRestoreCompleteData(csvText) {
                         const rateInput = row.querySelector('.rate-input');
                         const checkbox = row.querySelector('input[type="checkbox"]');
 
-                        if (rateInput) rateInput.value = data.rate.toFixed(2);
+                        if (rateInput) rateInput.value = data.rate;
                         if (checkbox) {
                             checkbox.checked = data.emiPaid;
                             toggleRowHighlight(row, data.emiPaid);
@@ -340,12 +442,35 @@ function parseAndRestoreCompleteData(csvText) {
                 document.body.removeChild(progressMsg);
 
                 // Show success message
-                alert(`✅ Complete loan data imported successfully!\n\n` +
-                    `📊 Loan Details: Restored\n` +
+                let successMsg = `✅ Complete loan data imported successfully!\n\n`;
+
+                if (loanName) {
+                    successMsg += `📋 Loan: ${loanName}\n`;
+                    if (loanType === 'other' && customLoanType) {
+                        successMsg += `📂 Type: ${customLoanType}\n\n`;
+                    } else {
+                        const typeLabels = {
+                            'home': 'Home Loan',
+                            'payday': 'Plot Loan',
+                            'gold': 'Gold Loan',
+                            'personal': 'Personal Loan',
+                            'education': 'Education Loan',
+                            'mortgage': 'Mortgage Loan',
+                            'car': 'Car Loan',
+                            'business': 'Business Loan',
+                            'other': 'Other'
+                        };
+                        successMsg += `📂 Type: ${typeLabels[loanType] || loanType}\n\n`;
+                    }
+                }
+
+                successMsg += `📊 Loan Details: Restored\n` +
                     `📅 Monthly Schedule: ${monthlyRows.length} months\n` +
                     `💵 Prepayments: ${Object.keys(importedPrepaymentsData).length} months\n` +
                     `📊 Other Charges: ${Object.keys(importedChargesData).length} months\n\n` +
-                    `All pages (Payment Details, Prepayment Details, Charges Details) are now automatically updated! 🎉`);
+                    `All pages (Payment Details, Prepayment Details, Charges Details) are now automatically updated! 🎉`;
+
+                alert(successMsg);
 
             } catch (error) {
                 document.body.removeChild(progressMsg);
