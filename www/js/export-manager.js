@@ -1,35 +1,4 @@
 // Export functions for CSV generation - Works for Both Web and Cordova/Android
-// function exportAmortizationToCSV() {
-//     if (allTableRows.length === 0) {
-//         alert('Please generate the amortization table first.');
-//         return;
-//     }
-
-//     let csv = 'EMI Paid,Month,Opening Balance,Interest Rate (%),Interest,Principal,EMI,Pre-payment,Pre-payment Count,Other Charges,Other Charges Count,Closing Balance\n';
-
-//     allTableRows.forEach(row => {
-//         const checkbox = row.querySelector('input[type="checkbox"]');
-//         const month = row.dataset.month;
-
-//         // Get raw numeric values without formatting for CSV
-//         const opening = parseFloat(row.querySelector('.opening').textContent.replace(/,/g, ''));
-//         const rate = row.querySelector('.rate-input').value;
-//         const interest = parseFloat(row.querySelector('.interest').textContent.replace(/,/g, ''));
-//         const principal = parseFloat(row.querySelector('.principal').textContent.replace(/,/g, ''));
-//         const emi = parseFloat(row.querySelector('.emi').textContent.replace(/,/g, ''));
-//         const prepayment = getTotalPrepaymentForMonth(month);
-//         const prepaymentCount = getPrepaymentCountForMonth(month);
-//         const charges = getTotalChargesForMonth(month);
-//         const chargesCount = getChargesCountForMonth(month);
-//         const closing = parseFloat(row.querySelector('.closing').textContent.replace(/,/g, ''));
-
-//         const emiPaid = checkbox.checked ? 'Yes' : 'No';
-
-//         csv += `${emiPaid},${month},${opening.toFixed(2)},${rate},${interest.toFixed(2)},${principal.toFixed(2)},${emi.toFixed(2)},${prepayment.toFixed(2)},${prepaymentCount},${charges.toFixed(2)},${chargesCount},${closing.toFixed(2)}\n`;
-//     });
-
-//     downloadCSV(csv, 'loan_amortization.csv');
-// }
 
 function exportPaymentDetailsToCSV() {
     let hasData = false;
