@@ -152,6 +152,14 @@
                 </svg>
                 Payment Details
             </button>
+            <button class="btn btn-import" onclick="importAmortizationFromCSV()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                Import from CSV
+            </button>
         </div>
 
         <!-- Combined status container for both messages -->
@@ -305,14 +313,6 @@
     <!-- Amortization Table Container -->
     <div id="amortizationTableContainer" style="display: none;">
         <div class="year-filter-container" id="yearFilterContainer" style="display: none;">
-            <button class="btn btn-import" onclick="importAmortizationFromCSV()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="17 8 12 3 7 8"></polyline>
-                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                </svg>
-                Import from CSV
-            </button>
             <button class="btn btn-export" onclick="exportAmortizationToCSV()">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
