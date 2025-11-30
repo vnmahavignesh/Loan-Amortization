@@ -1,6 +1,51 @@
 // Export functions for CSV generation - Works for Both Web and Cordova/Android
 // UPDATED: Saves to Downloads folder for ALL Android versions
 
+function exportPaymentDetailsToCSV() {
+    let hasData = false;
+    let csv = 'Month,Pre-payment Amount,Pre-payment Date,Pre-payment Description,Other Charges,Other Charges Date,Other Charges Description\n';
+
+    for (let month = 1; month <= allTableRows.length; month++) {
+        const hasPrepayments = prepaymentsData[month] && prepaymentsData[month].length > 0;
+        const hasCharges = chargesData[month] && chargesData[month].length > 0;
+
+        if (hasPrepayments || hasCharges) {
+            hasData = true;
+
+            const maxEntries = Math.max(
+                hasPrepayments ? prepaymentsData[month].length : 0,
+                hasCharges ? chargesData[month].length : 0
+            );
+
+            for (let i = 0; i < maxEntries; i++) {
+                const prepayment = hasPrepayments && i < prepaymentsData[month].length
+                    ? prepaymentsData[month][i]
+                    : null;
+
+                const charge = hasCharges && i < chargesData[month].length
+                    ? chargesData[month][i]
+                    : null;
+
+                const prepaymentAmount = prepayment ? prepayment.amount.toFixed(2) : '';
+                const prepaymentDate = prepayment && prepayment.date ? prepayment.date : '';
+                const prepaymentDescription = prepayment && prepayment.description ? prepayment.description : '';
+                const chargeAmount = charge ? charge.amount.toFixed(2) : '';
+                const chargeDate = charge && charge.date ? charge.date : '';
+                const chargeDescription = charge && charge.description ? charge.description : '';
+
+                csv += `${month},${prepaymentAmount},"${prepaymentDate}","${prepaymentDescription}",${chargeAmount},"${chargeDate}","${chargeDescription}"\n`;
+            }
+        }
+    }
+
+    if (!hasData) {
+        alert('No payment details to export.');
+        return;
+    }
+
+    downloadCSV(csv, 'payment_details.csv');
+}
+
 function exportPrepaymentDetailsToCSV() {
     let hasData = false;
     let csv = 'Month,Pre-payment Number,Pre-payment Amount,Pre-payment Date,Pre-payment Description\n';
