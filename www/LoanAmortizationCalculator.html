@@ -56,7 +56,7 @@
         </div>
     </div>
     <!-- Mobile Menu Button (visible only on mobile) -->
-    <button class="mobile-menu-btn" onclick="toggleSidebar()" style="display: none;">
+    <button class="mobile-menu-btn" onclick="toggleSidebar()" style="display: none; margin-top: 13px;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M3 12h18M3 6h18M3 18h18"></path>
         </svg>
@@ -95,93 +95,97 @@
 
     <!-- Full-width Loan Inputs Banner -->
     <div class="loan-inputs-banner">
-        <h1>💰 Loan Amortization Calculator</h1>
-        <h3 class="section-subtitle">📝 Loan Details</h3>
-        <div class="input-grid">
-            <div class="input-item">
-                <label class="input-label">Loan Amount (₹)</label>
-                <input type="text" id="loanAmountInput" class="input-field" placeholder="e.g 1000000" min="1" step="1"
-                    pattern="[0-9]*">
-                <div class="error-message" id="loanAmountError">Please enter positive integers only</div>
-            </div>
-            <div class="input-item">
-                <label class="input-label">Interest Rate (% p.a.)</label>
-                <input type="text" step="0.01" id="rateInput" class="input-field" placeholder="e.g 8.55" min="0.01">
-                <div class="error-message" id="rateInputError">Please enter positive numbers only (e.g., 8.55 or 12.345)
+        <div style="padding-top: 40px;">
+            <h1>💰 Loan Amortization Calculator</h1>
+            <h3 class="section-subtitle">📝 Loan Details</h3>
+            <div class="input-grid">
+                <div class="input-item">
+                    <label class="input-label">Loan Amount (₹)</label>
+                    <input type="text" id="loanAmountInput" class="input-field" placeholder="e.g 1000000" min="1"
+                        step="1" pattern="[0-9]*">
+                    <div class="error-message" id="loanAmountError">Please enter positive integers only</div>
+                </div>
+                <div class="input-item">
+                    <label class="input-label">Interest Rate (% p.a.)</label>
+                    <input type="text" step="0.01" id="rateInput" class="input-field" placeholder="e.g 8.55" min="0.01">
+                    <div class="error-message" id="rateInputError">Please enter positive numbers only (e.g., 8.55 or
+                        12.345)
+                    </div>
+                </div>
+                <div class="input-item">
+                    <label class="input-label">Total Tenure (months)</label>
+                    <input type="text" id="tenureInput" class="input-field" placeholder="e.g 60" min="1" step="1"
+                        pattern="[0-9]*">
+                    <div class="error-message" id="tenureInputError">Please enter positive integers only</div>
+                </div>
+                <div class="input-item">
+                    <label class="input-label">Monthly EMI (₹)</label>
+                    <input type="text" id="emiInput" class="input-field" placeholder="e.g 36544" min="1" step="1"
+                        pattern="[0-9]*">
+                    <div class="error-message" id="emiInputError">Please enter positive integers only</div>
+                    <div class="auto-calc-indicator" id="emiAutoCalcIndicator">Auto-calculated</div>
                 </div>
             </div>
-            <div class="input-item">
-                <label class="input-label">Total Tenure (months)</label>
-                <input type="text" id="tenureInput" class="input-field" placeholder="e.g 60" min="1" step="1"
-                    pattern="[0-9]*">
-                <div class="error-message" id="tenureInputError">Please enter positive integers only</div>
-            </div>
-            <div class="input-item">
-                <label class="input-label">Monthly EMI (₹)</label>
-                <input type="text" id="emiInput" class="input-field" placeholder="e.g 36544" min="1" step="1"
-                    pattern="[0-9]*">
-                <div class="error-message" id="emiInputError">Please enter positive integers only</div>
-                <div class="auto-calc-indicator" id="emiAutoCalcIndicator">Auto-calculated</div>
-            </div>
-        </div>
-        <div class="button-container">
-            <button class="generate-btn" onclick="generateTable()" id="generateTableBtn">📊 Generate Table</button>
+            <div class="button-container">
+                <button class="generate-btn" onclick="generateTable()" id="generateTableBtn">📊 Generate Table</button>
 
-            <button class="btn btn-save" onclick="saveData()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                    <polyline points="7 3 7 8 15 8"></polyline>
-                </svg>
-                Save Changes
-            </button>
+                <button class="btn btn-save" onclick="saveData()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                        <polyline points="7 3 7 8 15 8"></polyline>
+                    </svg>
+                    Save Changes
+                </button>
 
-            <button class="btn btn-clear" onclick="clearAllData()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="3 6 5 6 21 6"></polyline>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                </svg>
-                Clear All Data
-            </button>
+                <button class="btn btn-clear" onclick="clearAllData()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    Clear All Data
+                </button>
 
-            <button class="btn btn-details" onclick="showPaymentDetailsPage()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="16" x2="12" y2="12"></line>
-                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                </svg>
-                Payment Details
-            </button>
-            <button class="btn btn-import" onclick="importAmortizationFromCSV()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="17 8 12 3 7 8"></polyline>
-                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                </svg>
-                Import from CSV
-            </button>
-        </div>
-
-        <!-- Combined status container for both messages -->
-        <div class="status-container">
-            <!-- Unsaved changes indicator -->
-            <div class="unsaved-indicator" id="unsavedIndicator">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
-                    </path>
-                    <line x1="12" y1="9" x2="12" y2="13"></line>
-                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                </svg>
-                <span>You have unsaved changes. Click "Save Changes" to persist your data.</span>
+                <button class="btn btn-details" onclick="showPaymentDetailsPage()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    Payment Details
+                </button>
+                <button class="btn btn-import" onclick="importAmortizationFromCSV()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    Import from CSV
+                </button>
             </div>
 
-            <!-- Save success status -->
-            <div class="save-status" id="saveStatus">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                </svg>
-                <span>✓ Changes saved successfully!</span>
+            <!-- Combined status container for both messages -->
+            <div class="status-container">
+                <!-- Unsaved changes indicator -->
+                <div class="unsaved-indicator" id="unsavedIndicator">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                        </path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    <span>You have unsaved changes. Click "Save Changes" to persist your data.</span>
+                </div>
+
+                <!-- Save success status -->
+                <div class="save-status" id="saveStatus">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    <span>✓ Changes saved successfully!</span>
+                </div>
             </div>
         </div>
     </div>
