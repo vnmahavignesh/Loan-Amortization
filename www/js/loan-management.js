@@ -260,11 +260,16 @@ function showDeleteLoanModal(loanId) {
     const loan = loans.find(l => l.id === loanId);
     const modal = document.getElementById('deleteLoanModal');
     const loanNameSpan = document.getElementById('deleteLoanName');
+    // Ensure parent overlay is visible
+    const parentOverlay = document.getElementById('loanModal');
 
     if (loanNameSpan && loan) {
         loanNameSpan.textContent = loan.name;
     }
 
+    if (parentOverlay) {
+        parentOverlay.classList.add('show');
+    }
     if (modal) {
         modal.classList.add('show');
     }
@@ -277,6 +282,11 @@ function closeDeleteLoanModal() {
     const modal = document.getElementById('deleteLoanModal');
     if (modal) {
         modal.classList.remove('show');
+    }
+    // Hide parent overlay if only delete modal was open
+    const parentOverlay = document.getElementById('loanModal');
+    if (parentOverlay) {
+        parentOverlay.classList.remove('show');
     }
     deletingLoanId = null;
 }

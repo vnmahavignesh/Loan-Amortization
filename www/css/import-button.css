@@ -1,0 +1,46 @@
+/* Add this to your www/css/style.css file */
+
+/* Import Button Styles */
+.btn-import {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-import:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-import:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.4);
+}
+
+/* Responsive adjustments for export/import buttons */
+@media (max-width: 768px) {
+    .year-filter-container {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+
+    .year-filter-container>div:first-child {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .year-filter-container .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .year-filter-controls {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .year-filter-select {
+        width: 100%;
+    }
+}
