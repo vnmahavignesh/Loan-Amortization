@@ -224,6 +224,11 @@ function filterByYear() {
         // Calculate and display year totals
         calculateYearTotals(selectedYear);
         yearSummary.classList.add('show');
+
+        // NEW: Initialize accordion state when year summary becomes visible
+        setTimeout(() => {
+            initializeYearSummaryAccordion();
+        }, 100);
     }
 }
 

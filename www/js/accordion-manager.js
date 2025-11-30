@@ -133,6 +133,13 @@ function saveAccordionState() {
 const originalToggleAccordion = toggleAccordion;
 toggleAccordion = function (header) {
     originalToggleAccordion(header);
+    // Check if this is the year summary accordion
+    if (header.closest('.year-details-section')) {
+        saveYearSummaryAccordionState();
+    } else {
+        // Save main accordion state
+        saveAccordionState();
+    }
     saveAccordionState();
 };
 
@@ -182,6 +189,37 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+    // Watch for year summary visibility changes
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.attributeName === 'class') {
+                const yearSummary = document.getElementById('yearSummary');
+                if (yearSummary && yearSummary.classList.contains('show')) {
+                    const yearHeader = yearSummary.querySelector('.accordion-header');
+                    if (yearHeader && !yearHeader.hasAttribute('tabindex')) {
+                        yearHeader.setAttribute('tabindex', '0');
+                        yearHeader.setAttribute('role', 'button');
+                        yearHeader.setAttribute('aria-expanded', 'false');
+                        
+                        yearHeader.addEventListener('keydown', function(e) {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                toggleAccordion(this);
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    });
+    
+    const yearSummary = document.getElementById('yearSummary');
+    if (yearSummary) {
+        observer.observe(yearSummary, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
+    }
 });
 
 /**
@@ -207,3 +245,39 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+/**
+ * Initialize year summary accordion state
+ */
+function initializeYearSummaryAccordion() {
+    const savedState = localStorage.getItem('yearSummaryAccordionState');
+
+    if (savedState) {
+        try {
+            const state = JSON.parse(savedState);
+            if (state.expanded) {
+                expandAccordionSection('year-details-section');
+            }
+        } catch (e) {
+            console.error('Error loading year summary accordion state:', e);
+            expandAccordionSection('year-details-section');
+        }
+    } else {
+        // Default: Expand on first load
+        expandAccordionSection('year-details-section');
+    }
+}
+
+/**
+ * Save year summary accordion state
+ */
+function saveYearSummaryAccordionState() {
+    const header = document.querySelector('.year-details-section .accordion-header');
+
+    if (header) {
+        const state = {
+            expanded: header.classList.contains('active')
+        };
+        localStorage.setItem('yearSummaryAccordionState', JSON.stringify(state));
+    }
+}

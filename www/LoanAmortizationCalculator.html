@@ -333,29 +333,41 @@
             </div>
         </div>
 
-        <!-- Year Summary Section -->
-        <div class="year-summary" id="yearSummary">
-            <h3 style="margin-bottom: 15px; color: #333; font-size: 1.3em;" id="yearSummaryTitle">Year Summary</h3>
-            <div class="year-summary-grid">
-                <div class="year-summary-item">
-                    <div class="year-summary-label">Total Principal Paid</div>
-                    <div class="year-summary-value" id="yearPrincipalPaid">₹0.00</div>
+        <!-- Year Summary Accordion Section -->
+        <div class="year-summary-accordion" id="yearSummary">
+            <div class="accordion-section year-details-section">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span>📅</span>
+                        <span id="yearSummaryTitle">Year Summary</span>
+                    </div>
+                    <svg class="accordion-icon chevron-icon" viewBox="0 0 24 24">
+                        <path d="M6 9l6 6 6-6" />
+                    </svg>
                 </div>
-                <div class="year-summary-item">
-                    <div class="year-summary-label">Total Interest Paid</div>
-                    <div class="year-summary-value" id="yearInterestPaid">₹0.00</div>
-                </div>
-                <div class="year-summary-item">
-                    <div class="year-summary-label">Total Pre-payments</div>
-                    <div class="year-summary-value" id="yearPrepayments">₹0.00</div>
-                </div>
-                <div class="year-summary-item">
-                    <div class="year-summary-label">Total Charges</div>
-                    <div class="year-summary-value" id="yearCharges">₹0.00</div>
-                </div>
-                <div class="year-summary-item">
-                    <div class="year-summary-label">Closing Balance</div>
-                    <div class="year-summary-value" id="yearClosingBalance">₹0.00</div>
+                <div class="accordion-content">
+                    <div class="accordion-grid">
+                        <div class="accordion-item">
+                            <span class="accordion-label">💰 Total Principal Paid</span>
+                            <span class="accordion-value value-primary" id="yearPrincipalPaid">₹0.00</span>
+                        </div>
+                        <div class="accordion-item">
+                            <span class="accordion-label">📈 Total Interest Paid</span>
+                            <span class="accordion-value value-danger" id="yearInterestPaid">₹0.00</span>
+                        </div>
+                        <div class="accordion-item">
+                            <span class="accordion-label">💵 Total Pre-payments</span>
+                            <span class="accordion-value value-warning" id="yearPrepayments">₹0.00</span>
+                        </div>
+                        <div class="accordion-item">
+                            <span class="accordion-label">📊 Total Charges</span>
+                            <span class="accordion-value value-purple" id="yearCharges">₹0.00</span>
+                        </div>
+                        <div class="accordion-item">
+                            <span class="accordion-label">💼 Closing Balance</span>
+                            <span class="accordion-value value-info" id="yearClosingBalance">₹0.00</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

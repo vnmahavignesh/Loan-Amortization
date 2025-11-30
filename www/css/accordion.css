@@ -253,3 +253,130 @@
     stroke-width: 2;
     fill: none;
 }
+
+/* Add this to www/css/accordion.css or create a new file */
+
+/* Year Summary Accordion Styles */
+.year-summary-accordion {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    display: none;
+    /* Hidden by default, shown when year filter is active */
+}
+
+.year-summary-accordion.show {
+    display: block;
+}
+
+.year-details-section {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.year-details-section .accordion-header {
+    padding: 15px 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+    transition: all 0.3s ease;
+    border-bottom: 2px solid transparent;
+    background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(76, 175, 80, 0.1) 100%);
+}
+
+.year-details-section .accordion-header:hover {
+    background: rgba(33, 150, 243, 0.15);
+}
+
+.year-details-section .accordion-header.active {
+    border-bottom-color: #2196f3;
+}
+
+.year-details-section .accordion-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #2196f3;
+}
+
+/* Override accordion grid for year summary to show all items in a row on desktop */
+@media (min-width: 769px) {
+    .year-details-section .accordion-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .year-details-section .accordion-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+/* Year summary specific item styling */
+.year-details-section .accordion-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 15px 10px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.year-details-section .accordion-item:hover {
+    background: #e3f2fd;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+}
+
+.year-details-section .accordion-label {
+    color: #666;
+    font-size: 0.85em;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.year-details-section .accordion-value {
+    font-size: 1.2em;
+    font-weight: 700;
+}
+
+/* Animation for year summary expand */
+.year-details-section .accordion-content.expanded {
+    animation: slideDown 0.3s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .year-details-section .accordion-header {
+        padding: 12px 15px;
+    }
+
+    .year-details-section .accordion-title {
+        font-size: 1em;
+    }
+
+    .year-details-section .accordion-item {
+        padding: 12px 8px;
+    }
+
+    .year-details-section .accordion-label {
+        font-size: 0.8em;
+    }
+
+    .year-details-section .accordion-value {
+        font-size: 1em;
+    }
+}
