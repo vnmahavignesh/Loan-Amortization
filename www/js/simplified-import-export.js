@@ -1,8 +1,10 @@
 // simplified-import-export.js - Complete Loan Data Import/Export
+// Works on BOTH web browsers and mobile (Android)
 
 /**
  * Export complete amortization table with all loan details
  * Includes: Loan name, type, parameters, monthly schedule, prepayments, and charges
+ * WORKS: Web + Mobile
  */
 function exportAmortizationToCSV() {
     if (allTableRows.length === 0) {
@@ -68,7 +70,6 @@ function exportAmortizationToCSV() {
         let prepaymentDesc = '';
 
         if (prepaymentsData[month] && prepaymentsData[month].length > 0) {
-            // If multiple prepayments, sum them up and concatenate details
             prepaymentAmount = prepaymentsData[month].reduce((sum, p) => sum + p.amount, 0);
             prepaymentDate = prepaymentsData[month].map(p => p.date || '').join('; ');
             prepaymentDesc = prepaymentsData[month].map(p => p.description || '').filter(d => d).join('; ');
@@ -80,13 +81,12 @@ function exportAmortizationToCSV() {
         let chargesDesc = '';
 
         if (chargesData[month] && chargesData[month].length > 0) {
-            // If multiple charges, sum them up and concatenate details
             chargesAmount = chargesData[month].reduce((sum, c) => sum + c.amount, 0);
             chargesDate = chargesData[month].map(c => c.date || '').join('; ');
             chargesDesc = chargesData[month].map(c => c.description || '').filter(d => d).join('; ');
         }
 
-        // Escape and format fields that might contain commas
+        // Escape and format fields
         const escapedPrepaymentDesc = `"${prepaymentDesc.replace(/"/g, '""')}"`;
         const escapedChargesDesc = `"${chargesDesc.replace(/"/g, '""')}"`;
 
@@ -97,28 +97,192 @@ function exportAmortizationToCSV() {
 }
 
 /**
- * Import complete amortization table with all loan details
- * Restores: Loan parameters, monthly schedule, prepayments, and charges
+ * Import complete amortization table
+ * WORKS: Web + Mobile
  */
 function importAmortizationFromCSV() {
+    const isCordova = typeof cordova !== 'undefined' && window.cordova;
+
+    if (isCordova && window.device && window.device.platform === 'Android') {
+        // Mobile: Use enhanced file handling
+        importFromMobile();
+    } else {
+        // Web: Use standard file input
+        importFromBrowser();
+    }
+}
+
+/**
+ * Import for mobile devices (Android)
+ */
+function importFromMobile() {
+    console.log('Mobile import initiated...');
+
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = '.csv';
+    input.accept = '.csv,text/csv,application/csv,text/comma-separated-values';
+
+    // Mobile-specific styling for better visibility
+    input.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        z-index: 99999;
+    `;
+
+    document.body.appendChild(input);
+
+    input.onchange = function (e) {
+        const file = e.target.files[0];
+
+        // Remove input element
+        setTimeout(() => {
+            if (input.parentNode) {
+                document.body.removeChild(input);
+            }
+        }, 100);
+
+        if (!file) {
+            alert('❌ No file selected.');
+            return;
+        }
+
+        if (!file.name.toLowerCase().endsWith('.csv')) {
+            alert('❌ Please select a CSV file.');
+            return;
+        }
+
+        // Read file using FileReader (works on mobile)
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+            try {
+                const csvText = event.target.result;
+                parseAndRestoreCompleteData(csvText);
+            } catch (error) {
+                console.error('Error processing file:', error);
+                alert('❌ Error reading CSV file: ' + error.message);
+            }
+        };
+
+        reader.onerror = function (error) {
+            console.error('FileReader error:', error);
+            alert('❌ Error reading file. Please try again.');
+        };
+
+        reader.readAsText(file);
+    };
+
+    input.oncancel = function () {
+        setTimeout(() => {
+            if (input.parentNode) {
+                document.body.removeChild(input);
+            }
+        }, 100);
+    };
+
+    // Trigger file picker
+    setTimeout(() => {
+        input.click();
+    }, 100);
+}
+
+/**
+ * Import for web browsers
+ */
+function importFromBrowser() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.csv,text/csv,application/csv';
 
     input.onchange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
+
+        if (!file.name.toLowerCase().endsWith('.csv')) {
+            alert('❌ Please select a CSV file.');
+            return;
+        }
 
         try {
             const text = await file.text();
             parseAndRestoreCompleteData(text);
         } catch (error) {
             console.error('Error reading file:', error);
-            alert('❌ Error reading CSV file. Please try again.');
+            alert('❌ Error reading CSV file: ' + error.message);
         }
     };
 
     input.click();
+}
+
+/**
+ * Alternative: Import by filename from Downloads folder (Mobile only)
+ */
+function importFromDownloadsFolder() {
+    // Check if running in Cordova
+    if (!window.cordova || !window.cordova.file) {
+        alert('⚠️ This feature is only available in the mobile app.\n\nFor web browsers, use "Import from CSV" button.');
+        return;
+    }
+
+    const filename = prompt(
+        '📁 Import from Downloads Folder\n\n' +
+        'Enter the exact filename (including .csv extension):\n\n' +
+        'Example: loan_amortization_complete_2024-01-15.csv'
+    );
+
+    if (!filename || !filename.trim()) {
+        return;
+    }
+
+    if (!filename.toLowerCase().endsWith('.csv')) {
+        alert('❌ Filename must end with .csv extension.');
+        return;
+    }
+
+    const directory = cordova.file.externalRootDirectory + 'Download/';
+
+    window.resolveLocalFileSystemURL(directory, function (dirEntry) {
+        dirEntry.getFile(filename.trim(), { create: false }, function (fileEntry) {
+            fileEntry.file(function (file) {
+                const reader = new FileReader();
+
+                reader.onloadend = function () {
+                    try {
+                        const csvText = this.result;
+                        parseAndRestoreCompleteData(csvText);
+                    } catch (error) {
+                        console.error('Error parsing file:', error);
+                        alert('❌ Error reading CSV: ' + error.message);
+                    }
+                };
+
+                reader.onerror = function (error) {
+                    console.error('FileReader error:', error);
+                    alert('❌ Error reading file. Please try again.');
+                };
+
+                reader.readAsText(file);
+            }, function (error) {
+                console.error('Error getting file:', error);
+                alert('❌ Could not read file. Error code: ' + error.code);
+            });
+        }, function (error) {
+            console.error('File not found:', error);
+            alert('❌ File not found in Downloads folder.\n\n' +
+                'Please check:\n' +
+                '• File exists in Downloads\n' +
+                '• Filename is spelled correctly\n' +
+                '• File has .csv extension');
+        });
+    }, function (error) {
+        console.error('Downloads folder error:', error);
+        alert('❌ Cannot access Downloads folder.\nError code: ' + error.code);
+    });
 }
 
 /**
@@ -150,7 +314,7 @@ function parseAndRestoreCompleteData(csvText) {
             }
         }
 
-        // Parse loan identity (name and type) - if available
+        // Parse loan identity (name and type)
         let loanName = null;
         let loanType = null;
         let customLoanType = null;
@@ -168,7 +332,7 @@ function parseAndRestoreCompleteData(csvText) {
 
         // Parse loan details
         if (loanDetailsIndex === -1 || monthlyScheduleIndex === -1) {
-            alert('❌ Invalid CSV format. This does not appear to be a valid loan export file.');
+            alert('❌ Invalid CSV format.');
             return;
         }
 
@@ -185,13 +349,12 @@ function parseAndRestoreCompleteData(csvText) {
         const emi = parseFloat(loanDataLine[3]);
         const isEMIAuto = loanDataLine[4] ? loanDataLine[4].trim().toLowerCase() === 'yes' : false;
 
-        // Validate loan details
         if (isNaN(loanAmount) || isNaN(annualRate) || isNaN(tenure) || isNaN(emi)) {
-            alert('❌ Invalid loan parameters in CSV file.');
+            alert('❌ Invalid loan parameters.');
             return;
         }
 
-        // Parse monthly schedule data
+        // Parse monthly schedule
         const monthlyDataStart = monthlyScheduleIndex + 2;
         const monthlyRows = [];
         const importedPrepaymentsData = {};
@@ -201,9 +364,7 @@ function parseAndRestoreCompleteData(csvText) {
             const line = lines[i].trim();
             if (!line) continue;
 
-            // Parse CSV line handling quoted fields
             const values = parseCSVLine(line);
-
             if (values.length < 14) continue;
 
             const month = parseInt(values[1]);
@@ -222,17 +383,15 @@ function parseAndRestoreCompleteData(csvText) {
 
             monthlyRows.push(rowData);
 
-            // Build prepayments data structure
+            // Build prepayments data
             if (rowData.prepaymentAmount > 0) {
                 if (!importedPrepaymentsData[month]) {
                     importedPrepaymentsData[month] = [];
                 }
 
-                // Split multiple prepayments if they were concatenated
                 const dates = rowData.prepaymentDate.split(';').map(d => d.trim());
                 const descs = rowData.prepaymentDesc.split(';').map(d => d.trim());
 
-                // If we have multiple entries, create separate prepayment objects
                 if (dates.length > 1) {
                     const amountPerEntry = rowData.prepaymentAmount / dates.length;
                     dates.forEach((date, idx) => {
@@ -251,17 +410,15 @@ function parseAndRestoreCompleteData(csvText) {
                 }
             }
 
-            // Build charges data structure
+            // Build charges data
             if (rowData.chargesAmount > 0) {
                 if (!importedChargesData[month]) {
                     importedChargesData[month] = [];
                 }
 
-                // Split multiple charges if they were concatenated
                 const dates = rowData.chargesDate.split(';').map(d => d.trim());
                 const descs = rowData.chargesDesc.split(';').map(d => d.trim());
 
-                // If we have multiple entries, create separate charge objects
                 if (dates.length > 1) {
                     const amountPerEntry = rowData.chargesAmount / dates.length;
                     dates.forEach((date, idx) => {
@@ -282,56 +439,28 @@ function parseAndRestoreCompleteData(csvText) {
         }
 
         if (monthlyRows.length === 0) {
-            alert('❌ No valid monthly data found in CSV file.');
+            alert('❌ No valid monthly data found.');
             return;
         }
 
         // Build confirmation message
-        let confirmMsg = `Import complete loan data?\n\n`;
+        let confirmMsg = `Import loan data?\n\n`;
 
-        // Add loan identity if available
         if (loanName) {
-            confirmMsg += `📋 Loan Name: ${loanName}\n`;
-            if (loanType === 'other' && customLoanType) {
-                confirmMsg += `📂 Loan Type: ${customLoanType}\n`;
-            } else {
-                const typeLabels = {
-                    'home': 'Home Loan',
-                    'payday': 'Plot Loan',
-                    'gold': 'Gold Loan',
-                    'personal': 'Personal Loan',
-                    'education': 'Education Loan',
-                    'mortgage': 'Mortgage Loan',
-                    'car': 'Car Loan',
-                    'business': 'Business Loan',
-                    'other': 'Other'
-                };
-                confirmMsg += `📂 Loan Type: ${typeLabels[loanType] || loanType}\n`;
-            }
-            confirmMsg += `\n`;
+            confirmMsg += `📋 Loan: ${loanName}\n`;
+            confirmMsg += `📂 Type: ${loanType === 'other' && customLoanType ? customLoanType : loanType}\n\n`;
         }
 
-        confirmMsg += `📊 Loan Amount: ₹${formatIndianNumber(loanAmount.toFixed(2))}\n` +
-            `📈 Interest Rate: ${annualRate.toFixed(2)}% p.a.\n` +
+        confirmMsg += `📊 Amount: ₹${formatIndianNumber(loanAmount.toFixed(2))}\n` +
+            `📈 Rate: ${annualRate.toFixed(2)}%\n` +
             `📅 Tenure: ${tenure} months\n` +
-            `💰 Monthly EMI: ₹${formatIndianNumber(emi.toFixed(2))}\n` +
-            `📝 Monthly Records: ${monthlyRows.length}\n` +
-            `💵 Prepayment Months: ${Object.keys(importedPrepaymentsData).length}\n` +
-            `📊 Charges Months: ${Object.keys(importedChargesData).length}\n\n`;
-
-        // Check if importing into multi-loan system
-        if (typeof currentLoanId !== 'undefined' && currentLoanId) {
-            confirmMsg += `⚠️ This will update the current loan data.\n\n`;
-            confirmMsg += `Would you like to:\n`;
-            confirmMsg += `• OK - Update current loan\n`;
-            confirmMsg += `• Cancel - Create as new loan (use "Create New Loan" button first)`;
-        } else {
-            confirmMsg += `⚠️ This will replace your current data.`;
-        }
+            `💰 EMI: ₹${formatIndianNumber(emi.toFixed(2))}\n` +
+            `📝 Records: ${monthlyRows.length}\n\n` +
+            `⚠️ This will replace current data.`;
 
         if (!confirm(confirmMsg)) return;
 
-        // Show progress message
+        // Show progress
         const progressMsg = document.createElement('div');
         progressMsg.style.cssText = `
             position: fixed;
@@ -346,16 +475,15 @@ function parseAndRestoreCompleteData(csvText) {
             text-align: center;
         `;
         progressMsg.innerHTML = `
-            <h3 style="color: #667eea; margin-bottom: 15px;">🔄 Importing Data...</h3>
-            <p style="color: #666;">Please wait while we restore your loan data.</p>
+            <h3 style="color: #667eea; margin-bottom: 15px;">🔄 Importing...</h3>
+            <p style="color: #666;">Please wait...</p>
         `;
         document.body.appendChild(progressMsg);
 
-        // Small delay to show progress message
         setTimeout(() => {
             try {
-                // If loan name and type provided, update current loan info (if multi-loan system is active)
-                if (loanName && typeof currentLoanId !== 'undefined' && currentLoanId && typeof loans !== 'undefined' && loans.length > 0) {
+                // Update loan info if multi-loan system active
+                if (loanName && typeof currentLoanId !== 'undefined' && currentLoanId && typeof loans !== 'undefined') {
                     const currentLoan = loans.find(l => l.id === currentLoanId);
                     if (currentLoan) {
                         currentLoan.name = loanName;
@@ -365,33 +493,20 @@ function parseAndRestoreCompleteData(csvText) {
                         }
                         currentLoan.updatedAt = new Date().toISOString();
 
-                        // Save updated loan info
-                        if (typeof saveAllLoans === 'function') {
-                            saveAllLoans();
-                        }
-
-                        // Update loan header
-                        if (typeof updateLoanHeader === 'function') {
-                            updateLoanHeader(currentLoan);
-                        }
-
-                        // Re-render loans list
-                        if (typeof renderLoansList === 'function') {
-                            renderLoansList();
-                        }
+                        if (typeof saveAllLoans === 'function') saveAllLoans();
+                        if (typeof updateLoanHeader === 'function') updateLoanHeader(currentLoan);
+                        if (typeof renderLoansList === 'function') renderLoansList();
                     }
                 }
 
-                // Clear existing data
+                // Clear and restore data
                 clearCurrentLoanData();
 
-                // Set loan parameters
                 document.getElementById('loanAmountInput').value = Math.round(loanAmount);
                 document.getElementById('rateInput').value = annualRate;
                 document.getElementById('tenureInput').value = tenure;
                 document.getElementById('emiInput').value = Math.round(emi);
 
-                // Set EMI calculation mode
                 isEMIAutoCalculated = isEMIAuto;
                 if (isEMIAuto) {
                     document.getElementById('emiInput').classList.add('auto-calculated');
@@ -401,18 +516,14 @@ function parseAndRestoreCompleteData(csvText) {
                     document.getElementById('emiAutoCalcIndicator').classList.remove('show');
                 }
 
-                // Update global prepayments and charges data
                 prepaymentsData = importedPrepaymentsData;
                 chargesData = importedChargesData;
 
-                // Generate table
                 generateTable();
 
-                // Restore rates and EMI paid status
                 allTableRows.forEach((row, idx) => {
                     if (idx < monthlyRows.length) {
                         const data = monthlyRows[idx];
-
                         const rateInput = row.querySelector('.rate-input');
                         const checkbox = row.querySelector('input[type="checkbox"]');
 
@@ -422,55 +533,23 @@ function parseAndRestoreCompleteData(csvText) {
                             toggleRowHighlight(row, data.emiPaid);
                         }
 
-                        // Update prepayment and charges buttons
                         const month = parseInt(row.dataset.month);
                         updatePrepaymentInput(month);
                         updateChargesInput(month);
                     }
                 });
 
-                // Recompute with restored data
                 recomputeTable();
                 updateSavingsSummary();
-
-                // Save everything
                 saveData();
                 savePrepaymentsData();
                 saveChargesData();
 
-                // Remove progress message
                 document.body.removeChild(progressMsg);
 
-                // Show success message
-                let successMsg = `✅ Complete loan data imported successfully!\n\n`;
-
-                if (loanName) {
-                    successMsg += `📋 Loan: ${loanName}\n`;
-                    if (loanType === 'other' && customLoanType) {
-                        successMsg += `📂 Type: ${customLoanType}\n\n`;
-                    } else {
-                        const typeLabels = {
-                            'home': 'Home Loan',
-                            'payday': 'Plot Loan',
-                            'gold': 'Gold Loan',
-                            'personal': 'Personal Loan',
-                            'education': 'Education Loan',
-                            'mortgage': 'Mortgage Loan',
-                            'car': 'Car Loan',
-                            'business': 'Business Loan',
-                            'other': 'Other'
-                        };
-                        successMsg += `📂 Type: ${typeLabels[loanType] || loanType}\n\n`;
-                    }
-                }
-
-                successMsg += `📊 Loan Details: Restored\n` +
-                    `📅 Monthly Schedule: ${monthlyRows.length} months\n` +
-                    `💵 Prepayments: ${Object.keys(importedPrepaymentsData).length} months\n` +
-                    `📊 Other Charges: ${Object.keys(importedChargesData).length} months\n\n` +
-                    `All pages (Payment Details, Prepayment Details, Charges Details) are now automatically updated! 🎉`;
-
-                alert(successMsg);
+                alert('✅ Import successful!\n\n' +
+                    `📋 ${loanName || 'Loan'}\n` +
+                    `📅 ${monthlyRows.length} months restored`);
 
             } catch (error) {
                 document.body.removeChild(progressMsg);
@@ -479,8 +558,8 @@ function parseAndRestoreCompleteData(csvText) {
         }, 100);
 
     } catch (error) {
-        console.error('Error parsing CSV:', error);
-        alert('❌ Error parsing CSV file. Please check the file format.\n\nError: ' + error.message);
+        console.error('Parse error:', error);
+        alert('❌ Error parsing CSV: ' + error.message);
     }
 }
 
@@ -496,10 +575,9 @@ function parseCSVLine(line) {
         const char = line[i];
 
         if (char === '"') {
-            // Handle escaped quotes ""
             if (inQuotes && i + 1 < line.length && line[i + 1] === '"') {
                 current += '"';
-                i++; // Skip next quote
+                i++;
             } else {
                 inQuotes = !inQuotes;
             }
@@ -512,16 +590,14 @@ function parseCSVLine(line) {
     }
 
     values.push(current.trim());
-
     return values;
 }
 
 /**
- * Clear current loan data from UI (helper function if not exists)
+ * Clear current loan data (helper)
  */
 if (typeof clearCurrentLoanData === 'undefined') {
     function clearCurrentLoanData() {
-        // Clear input fields
         const loanAmount = document.getElementById('loanAmountInput');
         const rateInput = document.getElementById('rateInput');
         const tenureInput = document.getElementById('tenureInput');
@@ -532,16 +608,13 @@ if (typeof clearCurrentLoanData === 'undefined') {
         if (tenureInput) tenureInput.value = '';
         if (emiInput) emiInput.value = '';
 
-        // Clear table
         const tableBody = document.querySelector('#amortizationTable tbody');
         if (tableBody) tableBody.innerHTML = '';
         allTableRows = [];
 
-        // Clear prepayments and charges
         prepaymentsData = {};
         chargesData = {};
 
-        // Hide sections
         const amortizationContainer = document.getElementById('amortizationTableContainer');
         const summarySection = document.getElementById('summarySection');
         if (amortizationContainer) amortizationContainer.style.display = 'none';
