@@ -271,20 +271,21 @@ function saveLoanFromModal() {
 function showDeleteLoanModal(loanId) {
     deletingLoanId = loanId;
     const loan = loans.find(l => l.id === loanId);
-    const modal = document.getElementById('deleteLoanModal');
+    const deleteModal = document.getElementById('deleteLoanModal');
     const loanNameSpan = document.getElementById('deleteLoanName');
-    // Ensure parent overlay is visible
-    const parentOverlay = document.getElementById('loanModal');
+    const createEditModal = document.getElementById('loanModal');
+
+    // Hide the create/edit modal if open
+    if (createEditModal) {
+        createEditModal.classList.remove('show');
+    }
 
     if (loanNameSpan && loan) {
         loanNameSpan.textContent = loan.name;
     }
 
-    if (parentOverlay) {
-        parentOverlay.classList.add('show');
-    }
-    if (modal) {
-        modal.classList.add('show');
+    if (deleteModal) {
+        deleteModal.classList.add('show');
     }
 }
 
@@ -292,15 +293,11 @@ function showDeleteLoanModal(loanId) {
  * Close delete loan modal
  */
 function closeDeleteLoanModal() {
-    const modal = document.getElementById('deleteLoanModal');
-    if (modal) {
-        modal.classList.remove('show');
+    const deleteModal = document.getElementById('deleteLoanModal');
+    if (deleteModal) {
+        deleteModal.classList.remove('show');
     }
-    // Hide parent overlay if only delete modal was open
-    const parentOverlay = document.getElementById('loanModal');
-    if (parentOverlay) {
-        parentOverlay.classList.remove('show');
-    }
+    // Optionally re-show the create/edit modal if it was open before
     deletingLoanId = null;
 }
 

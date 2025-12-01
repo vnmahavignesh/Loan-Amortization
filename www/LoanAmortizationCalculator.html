@@ -645,6 +645,7 @@
         </div>
     </div>
 
+
     <!-- Create/Edit Loan Modal -->
     <div class="loan-modal-overlay" id="loanModal">
         <div class="loan-modal">
@@ -683,43 +684,43 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Delete Loan Confirmation Modal (NOW SEPARATE) -->
-        <div class="loan-modal-overlay" id="deleteLoanModal">
-            <div class="loan-modal">
-                <div class="loan-modal-header">
-                    <h3>Delete Loan</h3>
-                </div>
-                <div class="loan-modal-body">
-                    <p class="delete-loan-message">
-                        Are you sure you want to delete <span class="delete-loan-name" id="deleteLoanName"></span>?
-                        All data associated with this loan will be permanently deleted.
-                    </p>
-                </div>
-                <div class="loan-modal-footer">
-                    <button class="loan-modal-btn loan-modal-btn-secondary"
-                        onclick="closeDeleteLoanModal()">Cancel</button>
-                    <button class="loan-modal-btn loan-modal-btn-danger" onclick="confirmDeleteLoan()">Delete</button>
-                </div>
+    <!-- Delete Loan Confirmation Modal (NOW SEPARATE) -->
+    <div class="loan-modal-overlay" id="deleteLoanModal">
+        <div class="loan-modal">
+            <div class="loan-modal-header">
+                <h3>Delete Loan</h3>
+            </div>
+            <div class="loan-modal-body">
+                <p class="delete-loan-message">
+                    Are you sure you want to delete <span class="delete-loan-name" id="deleteLoanName"></span>?
+                    All data associated with this loan will be permanently deleted.
+                </p>
+            </div>
+            <div class="loan-modal-footer">
+                <button class="loan-modal-btn loan-modal-btn-secondary" onclick="closeDeleteLoanModal()">Cancel</button>
+                <button class="loan-modal-btn loan-modal-btn-danger" onclick="confirmDeleteLoan()">Delete</button>
             </div>
         </div>
+    </div>
 
-        <!-- JavaScript Files -->
-        <script src="cordova.js"></script>
-        <script src="js/storage-manager.js"></script>
-        <script src="js/calculator.js"></script>
-        <script src="js/table-manager.js"></script>
-        <script src="js/prepayment-manager.js"></script>
-        <script src="js/charges-manager.js"></script>
-        <script src="js/export-manager.js"></script>
-        <script src="js/savings-calculator.js"></script>
-        <script src="js/pages-manager.js"></script>
-        <script src="js/draggable.js"></script>
-        <script src="js/loan-management.js"></script>
-        <script src="js/accordion-manager.js"></script>
-        <script src="js/splash-screen.js"></script>
-        <script src="js/simplified-import-export.js"></script>
-        <script src="js/main.js"></script>
+    <!-- JavaScript Files -->
+    <script src="cordova.js"></script>
+    <script src="js/storage-manager.js"></script>
+    <script src="js/calculator.js"></script>
+    <script src="js/table-manager.js"></script>
+    <script src="js/prepayment-manager.js"></script>
+    <script src="js/charges-manager.js"></script>
+    <script src="js/export-manager.js"></script>
+    <script src="js/savings-calculator.js"></script>
+    <script src="js/pages-manager.js"></script>
+    <script src="js/draggable.js"></script>
+    <script src="js/loan-management.js"></script>
+    <script src="js/accordion-manager.js"></script>
+    <script src="js/splash-screen.js"></script>
+    <script src="js/simplified-import-export.js"></script>
+    <script src="js/main.js"></script>
 
 </body>
 
