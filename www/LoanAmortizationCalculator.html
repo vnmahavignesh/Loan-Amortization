@@ -113,10 +113,18 @@
                     </div>
                 </div>
                 <div class="input-item">
+                    <label class="input-label">Total Years</label>
+                    <input type="text" id="yearsInput" class="input-field" placeholder="e.g 5" min="1" step="1"
+                        pattern="[0-9]*">
+                    <div class="error-message" id="yearsInputError">Please enter positive integers only</div>
+                    <div class="auto-calc-indicator" id="yearsAutoCalcIndicator">Auto-calculated</div>
+                </div>
+                <div class="input-item">
                     <label class="input-label">Total Tenure (months)</label>
                     <input type="text" id="tenureInput" class="input-field" placeholder="e.g 60" min="1" step="1"
                         pattern="[0-9]*">
                     <div class="error-message" id="tenureInputError">Please enter positive integers only</div>
+                    <div class="auto-calc-indicator" id="tenureAutoCalcIndicator">Auto-calculated</div>
                 </div>
                 <div class="input-item">
                     <label class="input-label">Monthly EMI (₹)</label>

@@ -384,15 +384,19 @@ function saveLoanSpecificData(loanId) {
     // Save loan parameters
     const loanAmount = document.getElementById('loanAmountInput');
     const rateInput = document.getElementById('rateInput');
+    const yearsInput = document.getElementById('yearsInput');
     const tenureInput = document.getElementById('tenureInput');
     const emiInput = document.getElementById('emiInput');
 
-    if (loanAmount && rateInput && tenureInput && emiInput) {
+    if (loanAmount && rateInput && yearsInput && tenureInput && emiInput) {
         localStorage.setItem(`loanParameters_${loanId}`, JSON.stringify({
             loan: loanAmount.value,
             rate: rateInput.value,
+            years: yearsInput.value,
             tenure: tenureInput.value,
             emi: emiInput.value,
+            isYearsManual: !isYearsAutoCalculated,
+            isTenureManual: !isTenureAutoCalculated,
             isEMIManual: !isEMIAutoCalculated
         }));
     }
@@ -432,13 +436,39 @@ function loadLoanSpecificData(loanId) {
 
             const loanAmount = document.getElementById('loanAmountInput');
             const rateInput = document.getElementById('rateInput');
+            const yearsInput = document.getElementById('yearsInput');
             const tenureInput = document.getElementById('tenureInput');
             const emiInput = document.getElementById('emiInput');
 
             if (loanAmount) loanAmount.value = params.loan || '';
             if (rateInput) rateInput.value = params.rate || '';
+            if (yearsInput) yearsInput.value = params.years || '';
             if (tenureInput) tenureInput.value = params.tenure || '';
             if (emiInput) emiInput.value = params.emi || '';
+
+            // Restore years calculation state
+            if (params.isYearsManual === false && params.tenure) {
+                autoCalculateYearsFromTenure();
+            } else if (params.isYearsManual === true) {
+                if (yearsInput) {
+                    yearsInput.classList.remove('auto-calculated');
+                }
+                const indicator = document.getElementById('yearsAutoCalcIndicator');
+                if (indicator) indicator.classList.remove('show');
+                isYearsAutoCalculated = false;
+            }
+
+            // Restore tenure calculation state
+            if (params.isTenureManual === false && params.years) {
+                autoCalculateTenureFromYears();
+            } else if (params.isTenureManual === true) {
+                if (tenureInput) {
+                    tenureInput.classList.remove('auto-calculated');
+                }
+                const indicator = document.getElementById('tenureAutoCalcIndicator');
+                if (indicator) indicator.classList.remove('show');
+                isTenureAutoCalculated = false;
+            }
 
             // Restore EMI calculation state
             if (params.isEMIManual === false && params.loan && params.rate && params.tenure) {
@@ -506,11 +536,13 @@ function clearCurrentLoanData() {
     // Clear input fields
     const loanAmount = document.getElementById('loanAmountInput');
     const rateInput = document.getElementById('rateInput');
+    const yearsInput = document.getElementById('yearsInput');
     const tenureInput = document.getElementById('tenureInput');
     const emiInput = document.getElementById('emiInput');
 
     if (loanAmount) loanAmount.value = '';
     if (rateInput) rateInput.value = '';
+    if (yearsInput) yearsInput.value = '';
     if (tenureInput) tenureInput.value = '';
     if (emiInput) emiInput.value = '';
 

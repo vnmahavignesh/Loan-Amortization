@@ -42,6 +42,64 @@ function resetAutoEMI() {
     isEMIAutoCalculated = false;
 }
 
+// NEW: Auto-calculate tenure from years
+function autoCalculateTenureFromYears() {
+    const yearsInput = document.getElementById('yearsInput');
+
+    // Only auto-calculate if years input is valid
+    if (yearsInput.classList.contains('error')) {
+        return;
+    }
+
+    const years = parseInt(yearsInput.value) || 0;
+
+    if (years > 0) {
+        const tenure = years * 12;
+        document.getElementById('tenureInput').value = tenure;
+        document.getElementById('tenureInput').classList.add('auto-calculated');
+        document.getElementById('tenureAutoCalcIndicator').classList.add('show');
+        isTenureAutoCalculated = true;
+        // Immediately auto-calculate EMI after tenure is set
+        autoCalculateEMI();
+    }
+}
+
+// NEW: Auto-calculate years from tenure
+function autoCalculateYearsFromTenure() {
+    const tenureInput = document.getElementById('tenureInput');
+
+    // Only auto-calculate if tenure input is valid
+    if (tenureInput.classList.contains('error')) {
+        return;
+    }
+
+    const tenure = parseInt(tenureInput.value) || 0;
+
+    if (tenure > 0) {
+        const years = Math.floor(tenure / 12);
+        if (years > 0) {
+            document.getElementById('yearsInput').value = years;
+            document.getElementById('yearsInput').classList.add('auto-calculated');
+            document.getElementById('yearsAutoCalcIndicator').classList.add('show');
+            isYearsAutoCalculated = true;
+        }
+    }
+}
+
+// NEW: Reset auto-calculated years indicator
+function resetAutoYears() {
+    document.getElementById('yearsInput').classList.remove('auto-calculated');
+    document.getElementById('yearsAutoCalcIndicator').classList.remove('show');
+    isYearsAutoCalculated = false;
+}
+
+// NEW: Reset auto-calculated tenure indicator
+function resetAutoTenure() {
+    document.getElementById('tenureInput').classList.remove('auto-calculated');
+    document.getElementById('tenureAutoCalcIndicator').classList.remove('show');
+    isTenureAutoCalculated = false;
+}
+
 // Check if value is a valid positive integer (only digits, no other characters)
 function isValidPositiveInteger(value) {
     // Must contain only digits (0-9), nothing else
@@ -161,30 +219,34 @@ function validateTableRateInput(input) {
 function validateAllInputs() {
     const loanAmountInput = document.getElementById('loanAmountInput');
     const rateInput = document.getElementById('rateInput');
+    const yearsInput = document.getElementById('yearsInput');
     const tenureInput = document.getElementById('tenureInput');
     const emiInput = document.getElementById('emiInput');
 
     const loanAmountError = document.getElementById('loanAmountError');
     const rateInputError = document.getElementById('rateInputError');
+    const yearsInputError = document.getElementById('yearsInputError');
     const tenureInputError = document.getElementById('tenureInputError');
     const emiInputError = document.getElementById('emiInputError');
 
     // Validate each field with appropriate validation type
     const loanValid = validatePositiveInteger(loanAmountInput, loanAmountError);
     const rateValid = validatePositiveDecimal(rateInput, rateInputError);
+    const yearsValid = validatePositiveInteger(yearsInput, yearsInputError);
     const tenureValid = validatePositiveInteger(tenureInput, tenureInputError);
     const emiValid = validatePositiveInteger(emiInput, emiInputError);
 
     // Check if all required fields have values
     const loanHasValue = loanAmountInput.value.trim() !== '';
     const rateHasValue = rateInput.value.trim() !== '';
+    const yearsHasValue = yearsInput.value.trim() !== '';
     const tenureHasValue = tenureInput.value.trim() !== '';
     const emiHasValue = emiInput.value.trim() !== '';
 
     // Enable/disable generate button based on validation AND having values
     const generateBtn = document.getElementById('generateTableBtn');
-    const allValid = loanValid && rateValid && tenureValid && emiValid;
-    const allHaveValues = loanHasValue && rateHasValue && tenureHasValue && emiHasValue;
+    const allValid = loanValid && rateValid && yearsValid && tenureValid && emiValid;
+    const allHaveValues = loanHasValue && yearsHasValue && rateHasValue && tenureHasValue && emiHasValue;
 
     if (allValid && allHaveValues) {
         generateBtn.disabled = false;

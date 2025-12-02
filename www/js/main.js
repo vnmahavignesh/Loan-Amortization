@@ -5,6 +5,8 @@ let currentManagingMonth = null;
 let prepaymentsData = {};
 let chargesData = {};
 let isEMIAutoCalculated = false;
+let isYearsAutoCalculated = false;  // NEW
+let isTenureAutoCalculated = false; // NEW
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function () {
@@ -31,10 +33,20 @@ function initializeEventListeners() {
         markAsUnsaved();
     });
 
+    //Total Years - positive integers only
+    document.getElementById('yearsInput').addEventListener('input', function () {
+        validatePositiveInteger(this, document.getElementById('yearsInputError'));
+        validateAllInputs();
+        resetAutoYears();
+        autoCalculateTenureFromYears(); // This now also triggers EMI calculation
+        markAsUnsaved();
+    });
+
     // Total Tenure - positive integers only
     document.getElementById('tenureInput').addEventListener('input', function () {
         validatePositiveInteger(this, document.getElementById('tenureInputError'));
         validateAllInputs();
+        resetAutoTenure();
         autoCalculateEMI();
         markAsUnsaved();
     });

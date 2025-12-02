@@ -29,8 +29,27 @@ function loadSavedData() {
         const params = JSON.parse(savedLoanParams);
         document.getElementById('loanAmountInput').value = params.loan;
         document.getElementById('rateInput').value = params.rate;
+        document.getElementById('yearsInput').value = params.years;
         document.getElementById('tenureInput').value = params.tenure;
         document.getElementById('emiInput').value = params.emi;
+
+        // Handle years auto-calculation state
+        if (params.isYearsManual === false && params.tenure) {
+            autoCalculateYearsFromTenure();
+        } else if (params.isYearsManual === true) {
+            document.getElementById('yearsInput').classList.remove('auto-calculated');
+            document.getElementById('yearsAutoCalcIndicator').classList.remove('show');
+            isYearsAutoCalculated = false;
+        }
+
+        // Handle tenure auto-calculation state
+        if (params.isTenureManual === false && params.years) {
+            autoCalculateTenureFromYears();
+        } else if (params.isTenureManual === true) {
+            document.getElementById('tenureInput').classList.remove('auto-calculated');
+            document.getElementById('tenureAutoCalcIndicator').classList.remove('show');
+            isTenureAutoCalculated = false;
+        }
 
         // FIXED: Check if EMI was manually entered (isEMIManual flag)
         // Only auto-calculate if EMI was auto-calculated before
@@ -62,6 +81,7 @@ function saveData() {
 
     const loanAmount = parseFloat(document.getElementById('loanAmountInput').value);
     const rate = parseFloat(document.getElementById('rateInput').value);
+    const years = parseInt(document.getElementById('yearsInput').value);
     const tenure = parseInt(document.getElementById('tenureInput').value);
     const emi = parseFloat(document.getElementById('emiInput').value);
 
@@ -71,6 +91,9 @@ function saveData() {
         rate: rate,
         tenure: tenure,
         emi: emi,
+        years: years,
+        isYearsManual: !isYearsAutoCalculated,   // Save the Years entry mode
+        isTenureManual: !isTenureAutoCalculated, // Save the Tenure entry mode
         isEMIManual: !isEMIAutoCalculated  // Save the EMI entry mode
     }));
 
@@ -133,6 +156,7 @@ function clearAllData() {
         // Clear loan parameters and show placeholders
         document.getElementById('loanAmountInput').value = '';
         document.getElementById('rateInput').value = '';
+        document.getElementById('yearsInput').value = '';
         document.getElementById('tenureInput').value = '';
         document.getElementById('emiInput').value = '';
 

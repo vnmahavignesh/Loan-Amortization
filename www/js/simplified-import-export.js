@@ -17,6 +17,7 @@ function exportAmortizationToCSV() {
     const annualRate = parseFloat(document.getElementById('rateInput').value) || 0;
     const tenure = parseInt(document.getElementById('tenureInput').value) || 0;
     const emi = parseFloat(document.getElementById('emiInput').value) || 0;
+    const years = parseInt(document.getElementById('yearsInput').value) || Math.floor(tenure / 12) || 0;
 
     // Get loan name and type from current loan
     let loanName = 'My Loan';
@@ -42,8 +43,8 @@ function exportAmortizationToCSV() {
     csv += `${escapedLoanName},${loanType},${escapedCustomType}\n\n`;
 
     csv += '### LOAN DETAILS ###\n';
-    csv += 'Loan Amount,Interest Rate (%),Total Tenure (months),Monthly EMI,Is EMI Auto Calculated\n';
-    csv += `${loanAmount},${annualRate},${tenure},${emi},${isEMIAutoCalculated ? 'Yes' : 'No'}\n\n`;
+    csv += 'Loan Amount,Interest Rate (%),Total Tenure (months),Total Years,Monthly EMI,Is EMI Auto Calculated\n';
+    csv += `${loanAmount},${annualRate},${tenure},${years},${emi},${isEMIAutoCalculated ? 'Yes' : 'No'}\n\n`;
 
     // Add monthly amortization data header
     csv += '### MONTHLY SCHEDULE ###\n';
@@ -338,7 +339,7 @@ function parseAndRestoreCompleteData(csvText) {
 
         const loanDataLine = lines[loanDetailsIndex + 2].split(',');
 
-        if (loanDataLine.length < 4) {
+        if (loanDataLine.length < 5) {
             alert('❌ Invalid loan details format.');
             return;
         }
@@ -346,10 +347,11 @@ function parseAndRestoreCompleteData(csvText) {
         const loanAmount = parseFloat(loanDataLine[0]);
         const annualRate = parseFloat(loanDataLine[1]);
         const tenure = parseInt(loanDataLine[2]);
-        const emi = parseFloat(loanDataLine[3]);
-        const isEMIAuto = loanDataLine[4] ? loanDataLine[4].trim().toLowerCase() === 'yes' : false;
+        const years = parseInt(loanDataLine[3]);
+        const emi = parseFloat(loanDataLine[4]);
+        const isEMIAuto = loanDataLine[5] ? loanDataLine[5].trim().toLowerCase() === 'yes' : false;
 
-        if (isNaN(loanAmount) || isNaN(annualRate) || isNaN(tenure) || isNaN(emi)) {
+        if (isNaN(loanAmount) || isNaN(annualRate) || isNaN(tenure) || isNaN(emi) || isNaN(years)) {
             alert('❌ Invalid loan parameters.');
             return;
         }
@@ -453,6 +455,7 @@ function parseAndRestoreCompleteData(csvText) {
 
         confirmMsg += `📊 Amount: ₹${formatIndianNumber(loanAmount.toFixed(2))}\n` +
             `📈 Rate: ${annualRate.toFixed(2)}%\n` +
+            `📅 Years: ${years}\n` +
             `📅 Tenure: ${tenure} months\n` +
             `💰 EMI: ₹${formatIndianNumber(emi.toFixed(2))}\n` +
             `📝 Records: ${monthlyRows.length}\n\n` +
@@ -505,6 +508,7 @@ function parseAndRestoreCompleteData(csvText) {
                 document.getElementById('loanAmountInput').value = Math.round(loanAmount);
                 document.getElementById('rateInput').value = annualRate;
                 document.getElementById('tenureInput').value = tenure;
+                document.getElementById('yearsInput').value = years;
                 document.getElementById('emiInput').value = Math.round(emi);
 
                 isEMIAutoCalculated = isEMIAuto;
