@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self' data: https://ssl.gstatic.com 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;">
+
+    <title>Loan Amortization Calculator</title>
+
+    <!-- Cordova Script - MUST be first -->
+    <script type="text/javascript" src="cordova.js"></script>
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/enhancement.css">
+    <link rel="stylesheet" href="css/draggable.css">
+    <link rel="stylesheet" href="css/navigationbar.css">
+    <link rel="stylesheet" href="css/accordion.css">
+    <link rel="stylesheet" href="css/splash-screen.css">
+    <link rel="stylesheet" href="css/import-button.css">
+
+    <style>
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: flex !important;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Splash Screen -->
+    <div class="splash-screen" id="splashScreen">
+        <div class="splash-content">
+            <div class="splash-icon">💰</div>
+            <h1 class="splash-title">Loan Amortization Calculator</h1>
+            <p class="splash-subtitle">Your Financial Planning Companion</p>
+            <div class="loading-container">
+                <span class="loading-text">Loading Calculator</span>
+                <div class="loading-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="app">
+        <div id="deviceready" class="blink">
+            <p class="event listening">Dev by Maha Vignesh</p>
+        </div>
+    </div>
+    <!-- Mobile Menu Button (visible only on mobile) -->
+    <button class="mobile-menu-btn" onclick="toggleSidebar()" style="display: none; margin-top: 13px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12h18M3 6h18M3 18h18"></path>
+        </svg>
+    </button>
+
+    <!-- Sidebar Overlay (for mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Left Sidebar Navigation -->
+    <div class="loan-sidebar" id="loanSidebar">
+        <div class="sidebar-header">
+            <h2>My Loans</h2>
+            <button class="sidebar-toggle-btn" onclick="toggleSidebar()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 18l-6-6 6-6"></path>
+                </svg>
+            </button>
+        </div>
+
+        <div class="create-loan-section">
+            <button class="create-loan-btn" onclick="showCreateLoanModal()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14"></path>
+                </svg>
+                Create New Loan
+            </button>
+        </div>
+
+        <div class="loans-list">
+            <div class="loans-list-header">Your Loans</div>
+            <div id="loansList">
+                <!-- Loan items will be populated here by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Full-width Loan Inputs Banner -->
+    <div class="loan-inputs-banner">
+        <div style="padding-top: 40px;">
+            <h1>💰 Loan Amortization Calculator</h1>
+            <h3 class="section-subtitle">📝 Loan Details</h3>
+            <div class="input-grid">
+                <div class="input-item">
+                    <label class="input-label">Loan Amount (₹)</label>
+                    <input type="text" id="loanAmountInput" class="input-field" placeholder="e.g 1000000" min="1"
+                        step="1" pattern="[0-9]*">
+                    <div class="error-message" id="loanAmountError">Please enter positive integers only</div>
+                </div>
+                <div class="input-item">
+                    <label class="input-label">Interest Rate (% p.a.)</label>
+                    <input type="text" step="0.01" id="rateInput" class="input-field" placeholder="e.g 8.55" min="0.01">
+                    <div class="error-message" id="rateInputError">Please enter positive numbers only (e.g., 8.55 or
+                        12.345)
+                    </div>
+                </div>
+                <div class="input-item">
+                    <label class="input-label">Total Years</label>
+                    <input type="text" id="yearsInput" class="input-field" placeholder="e.g 5" min="1" step="1"
+                        pattern="[0-9]*">
+                    <div class="error-message" id="yearsInputError">Please enter positive integers only</div>
+                    <div class="auto-calc-indicator" id="yearsAutoCalcIndicator">Auto-calculated</div>
+                </div>
+                <div class="input-item">
+                    <label class="input-label">Total Tenure (months)</label>
+                    <input type="text" id="tenureInput" class="input-field" placeholder="e.g 60" min="1" step="1"
+                        pattern="[0-9]*">
+                    <div class="error-message" id="tenureInputError">Please enter positive integers only</div>
+                    <div class="auto-calc-indicator" id="tenureAutoCalcIndicator">Auto-calculated</div>
+                </div>
+                <div class="input-item">
+                    <label class="input-label">Monthly EMI (₹)</label>
+                    <input type="text" id="emiInput" class="input-field" placeholder="e.g 36544" min="1" step="1"
+                        pattern="[0-9]*">
+                    <div class="error-message" id="emiInputError">Please enter positive integers only</div>
+                    <div class="auto-calc-indicator" id="emiAutoCalcIndicator">Auto-calculated</div>
+                </div>
+            </div>
+            <div class="button-container">
+                <button class="generate-btn" onclick="generateTable()" id="generateTableBtn">📊 Generate Table</button>
+
+                <button class="btn btn-save" onclick="saveData()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                        <polyline points="7 3 7 8 15 8"></polyline>
+                    </svg>
+                    Save Changes
+                </button>
+
+                <button class="btn btn-clear" onclick="clearAllData()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    Clear All Data
+                </button>
+
+                <button class="btn btn-details" onclick="showPaymentDetailsPage()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    Payment Details
+                </button>
+                <button class="btn btn-import" onclick="importAmortizationFromCSV()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    Import from CSV
+                </button>
+            </div>
+
+            <!-- Combined status container for both messages -->
+            <div class="status-container">
+                <!-- Unsaved changes indicator -->
+                <div class="unsaved-indicator" id="unsavedIndicator">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                        </path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    <span>You have unsaved changes. Click "Save Changes" to persist your data.</span>
+                </div>
+
+                <!-- Save success status -->
+                <div class="save-status" id="saveStatus">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    <span>✓ Changes saved successfully!</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Section -->
+    <!-- Replace the existing Summary Section in LoanAmortizationCalculator.html -->
+    <div id="summarySection" class="outer-summary" style="display: none;">
+        <div class="summary-accordion">
+
+            <!-- Loan Summary Section -->
+            <div class="accordion-section loan-summary-section">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span>📊</span>
+                        <span>Loan Summary</span>
+                    </div>
+                    <svg class="accordion-icon chevron-icon" viewBox="0 0 24 24">
+                        <path d="M6 9l6 6 6-6" />
+                    </svg>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-grid">
+                        <div class="accordion-item">
+                            <span class="accordion-label">💵 Loan Amount</span>
+                            <span class="accordion-value value-primary" id="summaryLoanAmount">₹0.00</span>
+                        </div>
+                        <div class="accordion-item">
+                            <span class="accordion-label">📅 Tenure</span>
+                            <span class="accordion-value value-info" id="summaryTenure">0</span>
+                        </div>
+                        <div class="accordion-item">
+                            <span class="accordion-label">💰 Total Interest</span>
+                            <span class="accordion-value value-danger" id="summaryTotalInterest">₹0.00</span>
+                        </div>
+                        <div class="accordion-item">
+                            <span class="accordion-label">💳 Total Amount</span>
+                            <span class="accordion-value value-warning" id="summaryTotalAmount">₹0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Savings Summary Section -->
+            <div class="accordion-section savings-summary-section">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span>💰</span>
+                        <span>Savings Summary</span>
+                    </div>
+                    <svg class="accordion-icon chevron-icon" viewBox="0 0 24 24">
+                        <path d="M6 9l6 6 6-6" />
+                    </svg>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-grid">
+                        <div class="accordion-item">
+                            <span class="accordion-label">💰 Interest Saved</span>
+                            <span class="accordion-value value-success" id="interestSaved">₹0.00</span>
+                        </div>
+                        <div class="accordion-item">
+                            <span class="accordion-label">⏱️ Time Saved</span>
+                            <span class="accordion-value value-danger" id="timeSaved">0</span>
+                        </div>
+                        <div class="accordion-item">
+                            <span class="accordion-label">💵 Total Pre-payment</span>
+                            <span class="accordion-value value-warning" id="totalPrepayment">₹0.00</span>
+                        </div>
+                        <div class="accordion-item">
+                            <span class="accordion-label">📅 Remaining Tenure</span>
+                            <span class="accordion-value value-primary" id="remainingTenure">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Details Section -->
+            <div class="accordion-section payment-summary-section">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span>💳</span>
+                        <span>Payment Details</span>
+                    </div>
+                    <svg class="accordion-icon chevron-icon" viewBox="0 0 24 24">
+                        <path d="M6 9l6 6 6-6" />
+                    </svg>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-grid">
+                        <div class="accordion-item">
+                            <span class="accordion-label">💰 Interest Paid</span>
+                            <span class="accordion-value value-danger" id="totalInterestPaid">₹0.00</span>
+                        </div>
+                        <div class="accordion-item">
+                            <span class="accordion-label">💵 Principal Paid</span>
+                            <span class="accordion-value value-primary" id="totalPrincipalPaid">₹0.00</span>
+                        </div>
+                        <div class="accordion-item">
+                            <span class="accordion-label">💳 Total EMI Paid</span>
+                            <span class="accordion-value value-warning" id="totalEmiPaid">₹0.00</span>
+                        </div>
+                        <div class="accordion-item">
+                            <span class="accordion-label">📊 Other Charges</span>
+                            <span class="accordion-value value-purple" id="totalOtherCharges">₹0.00</span>
+                        </div>
+                    </div>
+
+                    <!-- Additional Details (Less Important Metrics) -->
+                    <div class="additional-details">
+                        <div class="additional-item">
+                            <span class="additional-label">📅 Prepayment Months</span>
+                            <span id="prepaymentMonths" class="prepayment-link" onclick="showPrepaymentDetailsPage()"
+                                style="color: #2ecc71; font-size: 1em; font-weight: 700;">0</span>
+                        </div>
+                        <div class="additional-item">
+                            <span class="additional-label">📊 Other Charges Months</span>
+                            <span id="chargesMonths" class="charges-link" onclick="showChargesDetailsPage()"
+                                style="color: #9b59b6; font-size: 1em; font-weight: 700;">0</span>
+                        </div>
+                        <div class="additional-item">
+                            <span class="additional-label">💎 New Total Interest</span>
+                            <span class="additional-value value-info" id="newTotalInterest">₹0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- Amortization Table Container -->
+    <div id="amortizationTableContainer" style="display: none;">
+        <div class="year-filter-container" id="yearFilterContainer" style="display: none;">
+            <button class="btn btn-export" onclick="exportAmortizationToCSV()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Export to CSV
+            </button>
+            <div class="year-filter-controls">
+                <label class="year-filter-label" style="color: rgb(244, 252, 244);">Filter by Year:</label>
+                <select class="year-filter-select" id="yearFilterSelect" onchange="filterByYear()">
+                    <option value="all">All Years</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Year Summary Accordion Section -->
+        <div class="year-summary-accordion" id="yearSummary">
+            <div class="accordion-section year-details-section">
+                <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-title">
+                        <span>📅</span>
+                        <span id="yearSummaryTitle">Year Summary</span>
+                    </div>
+                    <svg class="accordion-icon chevron-icon" viewBox="0 0 24 24">
+                        <path d="M6 9l6 6 6-6" />
+                    </svg>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-grid">
+                        <div class="accordion-item">
+                            <span class="accordion-label">💰 Total Principal Paid</span>
+                            <span class="accordion-value value-primary" id="yearPrincipalPaid">₹0.00</span>
+                        </div>
+                        <div class="accordion-item">
+                            <span class="accordion-label">📈 Total Interest Paid</span>
+                            <span class="accordion-value value-danger" id="yearInterestPaid">₹0.00</span>
+                        </div>
+                        <div class="accordion-item">
+                            <span class="accordion-label">💵 Total Pre-payments</span>
+                            <span class="accordion-value value-warning" id="yearPrepayments">₹0.00</span>
+                        </div>
+                        <div class="accordion-item">
+                            <span class="accordion-label">📊 Total Charges</span>
+                            <span class="accordion-value value-purple" id="yearCharges">₹0.00</span>
+                        </div>
+                        <div class="accordion-item">
+                            <span class="accordion-label">💼 Closing Balance</span>
+                            <span class="accordion-value value-info" id="yearClosingBalance">₹0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table id="amortizationTable">
+                <thead>
+                    <tr>
+                        <th>EMI Paid</th>
+                        <th>Month</th>
+                        <th>Opening Balance</th>
+                        <th>Interest Rate (%)</th>
+                        <th>Interest</th>
+                        <th>Principal</th>
+                        <th>EMI</th>
+                        <th>Pre-payment</th>
+                        <th>Other Charges</th>
+                        <th>Closing Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Payment Details Page -->
+    <div id="paymentDetailsPage" class="payment-details-page">
+        <div class="payment-details-header">
+            <div>
+                <h2 style="color: #333;">💰 Payment Details</h2>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 10px;">
+                    <div
+                        style="background: #e8f5e8; padding: 8px 15px; border-radius: 8px; display: flex; align-items: center; gap: 8px;">
+                        <span style="color: #666; font-size: 0.9em; font-weight: 600;">Total Pre-payment:</span>
+                        <span id="paymentPrepaymentTotalAmount"
+                            style="color: #f39c12; font-size: 1.1em; font-weight: 700;">₹0.00</span>
+                    </div>
+                    <div
+                        style="background: #e8f5e8; padding: 8px 15px; border-radius: 8px; display: flex; align-items: center; gap: 8px;">
+                        <span style="color: #666; font-size: 0.9em; font-weight: 600;">Pre-payment Months:</span>
+                        <span id="paymentPrepaymentTotalMonths"
+                            style="color: #667eea; font-size: 1.1em; font-weight: 700;">0</span>
+                    </div>
+                    <div
+                        style="background: #f3e5f5; padding: 8px 15px; border-radius: 8px; display: flex; align-items: center; gap: 8px;">
+                        <span style="color: #666; font-size: 0.9em; font-weight: 600;">Total Other Charges:</span>
+                        <span id="paymentChargesTotalAmount"
+                            style="color: #9b59b6; font-size: 1.1em; font-weight: 700;">₹0.00</span>
+                    </div>
+                    <div
+                        style="background: #f3e5f5; padding: 8px 15px; border-radius: 8px; display: flex; align-items: center; gap: 8px;">
+                        <span style="color: #666; font-size: 0.9em; font-weight: 600;">Other Charges Months:</span>
+                        <span id="paymentChargesTotalMonths"
+                            style="color: #667eea; font-size: 1.1em; font-weight: 700;">0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="payment-details-actions">
+                <button class="btn btn-export" onclick="exportPaymentDetailsToCSV()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Export to CSV
+                </button>
+                <button class="back-button" onclick="hidePaymentDetailsPage()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                    </svg>
+                    Back to Calculator
+                </button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="payment-details-table">
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Pre-payment Amount</th>
+                        <th>Pre-payment Date</th>
+                        <th>Pre-payment Description</th>
+                        <th>Other Charges</th>
+                        <th>Other Charges Date</th>
+                        <th>Other Charges Description</th>
+                    </tr>
+                </thead>
+                <tbody id="paymentDetailsBody">
+                    <!-- Payment details will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Prepayment Details Page -->
+    <div id="prepaymentDetailsPage" class="prepayment-details-page">
+        <div class="prepayment-details-header">
+            <div>
+                <h2 style="color: #333;">📅 Prepayment Details</h2>
+                <div style="display: flex; gap: 20px; margin-top: 10px;">
+                    <div
+                        style="background: #e8f5e8; padding: 8px 15px; border-radius: 8px; display: flex; align-items: center; gap: 8px;">
+                        <span style="color: #666; font-size: 0.9em; font-weight: 600;">Total Pre-payment:</span>
+                        <span id="prepaymentTotalAmount"
+                            style="color: #f39c12; font-size: 1.1em; font-weight: 700;">₹0.00</span>
+                    </div>
+                    <div
+                        style="background: #e8f5e8; padding: 8px 15px; border-radius: 8px; display: flex; align-items: center; gap: 8px;">
+                        <span style="color: #666; font-size: 0.9em; font-weight: 600;">Total Months:</span>
+                        <span id="prepaymentTotalMonths"
+                            style="color: #667eea; font-size: 1.1em; font-weight: 700;">0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="prepayment-details-actions">
+                <button class="btn btn-export" onclick="exportPrepaymentDetailsToCSV()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Export to CSV
+                </button>
+                <button class="back-button" onclick="hidePrepaymentDetailsPage()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                    </svg>
+                    Back to Calculator
+                </button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="prepayment-details-table">
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Pre-payment Amount</th>
+                        <th>Pre-payment Date</th>
+                        <th>Pre-payment Description</th>
+                    </tr>
+                </thead>
+                <tbody id="prepaymentDetailsBody">
+                    <!-- Prepayment details will be populated here -->
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <!-- Charges Details Page -->
+    <div id="chargesDetailsPage" class="charges-details-page">
+        <div class="charges-details-header">
+            <div>
+                <h2 style="color: #333;">📊 Other Charges Details</h2>
+                <div style="display: flex; gap: 20px; margin-top: 10px;">
+                    <div
+                        style="background: #f3e5f5; padding: 8px 15px; border-radius: 8px; display: flex; align-items: center; gap: 8px;">
+                        <span style="color: #666; font-size: 0.9em; font-weight: 600;">Total Other Charges:</span>
+                        <span id="chargesTotalAmount"
+                            style="color: #9b59b6; font-size: 1.1em; font-weight: 700;">₹0.00</span>
+                    </div>
+                    <div
+                        style="background: #f3e5f5; padding: 8px 15px; border-radius: 8px; display: flex; align-items: center; gap: 8px;">
+                        <span style="color: #666; font-size: 0.9em; font-weight: 600;">Total Months:</span>
+                        <span id="chargesTotalMonths"
+                            style="color: #667eea; font-size: 1.1em; font-weight: 700;">0</span>
+                    </div>
+                </div>
+            </div>
+            <div class="charges-details-actions">
+                <button class="btn btn-export" onclick="exportChargesDetailsToCSV()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Export to CSV
+                </button>
+                <button class="back-button" onclick="hideChargesDetailsPage()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                    </svg>
+                    Back to Calculator
+                </button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="charges-details-table">
+                <thead>
+                    <tr>
+                        <th>Month</th>
+                        <th>Other Charges</th>
+                        <th>Other Charges Date</th>
+                        <th>Other Charges Description</th>
+                    </tr>
+                </thead>
+                <tbody id="chargesDetailsBody">
+                    <!-- Charges details will be populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Prepayment Manager Modal -->
+    <div class="prepayment-manager-overlay" id="prepaymentManagerOverlay"></div>
+    <div class="prepayment-manager" id="prepaymentManager">
+        <div class="prepayment-manager-header">
+            <h3 style="color: #333; margin: 0;">Manage Prepayments - Month <span id="prepaymentManagerMonth">1</span>
+            </h3>
+            <button class="back-button" onclick="hidePrepaymentManager()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                </svg>
+                Close
+            </button>
+        </div>
+
+        <div class="prepayment-summary" id="prepaymentManagerSummary">
+            Total Prepayments: ₹0.00
+        </div>
+
+        <div class="prepayment-list" id="prepaymentList">
+            <!-- Prepayment items will be added here -->
+        </div>
+
+        <div class="add-prepayment-form">
+            <input type="number" id="newPrepaymentAmount" placeholder="Amount (₹)" step="1" min="1" class="input-field">
+            <input type="date" id="newPrepaymentDate" class="input-field">
+            <input type="text" id="newPrepaymentDescription" placeholder="Description (optional)" class="input-field">
+            <button class="btn btn-save btn-small" onclick="addPrepayment()">Add</button>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+            <button class="btn btn-clear" onclick="clearAllPrepayments()">Clear All</button>
+            <button class="btn btn-save" onclick="savePrepayments()">Save Changes</button>
+        </div>
+    </div>
+
+    <!-- Charges Manager Modal -->
+    <div class="charges-manager-overlay" id="chargesManagerOverlay"></div>
+    <div class="charges-manager" id="chargesManager">
+        <div class="charges-manager-header">
+            <h3 style="color: #333; margin: 0;">Manage Other Charges - Month <span id="chargesManagerMonth">1</span>
+            </h3>
+            <button class="back-button" onclick="hideChargesManager()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                </svg>
+                Close
+            </button>
+        </div>
+
+        <div class="charges-summary" id="chargesManagerSummary">
+            Total Other Charges: ₹0.00
+        </div>
+
+        <div class="charges-list" id="chargesList">
+            <!-- Charges items will be added here -->
+        </div>
+
+        <div class="add-charges-form">
+            <input type="number" id="newChargesAmount" placeholder="Amount (₹)" step="1" min="1" class="input-field">
+            <input type="date" id="newChargesDate" class="input-field">
+            <input type="text" id="newChargesDescription" placeholder="Description (optional)" class="input-field">
+            <button class="btn btn-save btn-small" onclick="addCharges()">Add</button>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+            <button class="btn btn-clear" onclick="clearAllCharges()">Clear All</button>
+            <button class="btn btn-save" onclick="saveCharges()">Save Changes</button>
+        </div>
+    </div>
+
+
+    <!-- Create/Edit Loan Modal -->
+    <div class="loan-modal-overlay" id="loanModal">
+        <div class="loan-modal">
+            <div class="loan-modal-header">
+                <h3 id="loanModalTitle">Create New Loan</h3>
+            </div>
+            <div class="loan-modal-body">
+                <div class="loan-form-group">
+                    <label for="loanNameInput">Loan Name *</label>
+                    <input type="text" id="loanNameInput" placeholder="e.g., Home Loan, Car Loan" required>
+                </div>
+                <div class="loan-form-group">
+                    <label for="loanTypeSelect">Loan Type *</label>
+                    <select id="loanTypeSelect" required>
+                        <option value="">Select loan type</option>
+                        <option value="Home Loan">Home Loan</option>
+                        <option value="Plot Loan">Plot Loan</option>
+                        <option value="Gold Loan">Gold Loan</option>
+                        <option value="Personal Loan">Personal Loan</option>
+                        <option value="Education Loan">Education Loan</option>
+                        <option value="Mortgage Loan">Mortgage Loan</option>
+                        <option value="Car Loan">Car Loan</option>
+                        <option value="Business Loan">Business Loan</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <!-- If user selects 'other' option, show an additional input field to specify custom loan type. -->
+                <div class="loan-form-group" id="customLoanTypeGroup" style="display: none;">
+                    <label for="customLoanTypeInput">Custom Loan Type *</label>
+                    <input type="text" id="customLoanTypeInput" placeholder="Specify custom loan type">
+                </div>
+                <div class="loan-modal-footer">
+                    <button class="loan-modal-btn loan-modal-btn-secondary" onclick="closeLoanModal()">Cancel</button>
+                    <button class="loan-modal-btn loan-modal-btn-primary" onclick="saveLoanFromModal()">Save
+                        Loan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Loan Confirmation Modal (NOW SEPARATE) -->
+    <div class="loan-modal-overlay" id="deleteLoanModal">
+        <div class="loan-modal">
+            <div class="loan-modal-header">
+                <h3>Delete Loan</h3>
+            </div>
+            <div class="loan-modal-body">
+                <p class="delete-loan-message">
+                    Are you sure you want to delete <span class="delete-loan-name" id="deleteLoanName"></span>?
+                    All data associated with this loan will be permanently deleted.
+                </p>
+            </div>
+            <div class="loan-modal-footer">
+                <button class="loan-modal-btn loan-modal-btn-secondary" onclick="closeDeleteLoanModal()">Cancel</button>
+                <button class="loan-modal-btn loan-modal-btn-danger" onclick="confirmDeleteLoan()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Files -->
+    <script src="cordova.js"></script>
+    <script src="js/storage-manager.js"></script>
+    <script src="js/calculator.js"></script>
+    <script src="js/table-manager.js"></script>
+    <script src="js/prepayment-manager.js"></script>
+    <script src="js/charges-manager.js"></script>
+    <script src="js/export-manager.js"></script>
+    <script src="js/savings-calculator.js"></script>
+    <script src="js/pages-manager.js"></script>
+    <script src="js/draggable.js"></script>
+    <script src="js/loan-management.js"></script>
+    <script src="js/accordion-manager.js"></script>
+    <script src="js/splash-screen.js"></script>
+    <script src="js/simplified-import-export.js"></script>
+    <script src="js/main.js"></script>
+
+</body>
+
+</html>

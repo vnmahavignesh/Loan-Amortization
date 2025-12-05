@@ -1,0 +1,382 @@
+/* Accordion Summary Styles */
+.summary-accordion {
+    background: linear-gradient(135deg, #e0f7fa 0%, #fff9c4 100%);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.accordion-section {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.accordion-section:last-child {
+    margin-bottom: 0;
+}
+
+.accordion-header {
+    padding: 15px 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+    transition: all 0.3s ease;
+    border-bottom: 2px solid transparent;
+}
+
+.accordion-header:hover {
+    background: rgba(102, 126, 234, 0.05);
+}
+
+.accordion-header.active {
+    border-bottom-color: #667eea;
+}
+
+.accordion-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #333;
+}
+
+.accordion-icon {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.3s ease;
+}
+
+.accordion-header.active .accordion-icon {
+    transform: rotate(180deg);
+}
+
+.accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    padding: 0 20px;
+}
+
+.accordion-content.expanded {
+    max-height: 1000px;
+    padding: 15px 20px;
+}
+
+.accordion-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.accordion-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.accordion-item:hover {
+    background: #e3f2fd;
+    transform: translateX(5px);
+}
+
+.accordion-label {
+    color: #666;
+    font-size: 0.9em;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.accordion-value {
+    font-size: 1.1em;
+    font-weight: 700;
+}
+
+/* Color coding for different sections */
+.loan-summary-section .accordion-header {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+}
+
+.loan-summary-section .accordion-title {
+    color: #667eea;
+}
+
+.savings-summary-section .accordion-header {
+    background: linear-gradient(135deg, rgba(39, 174, 96, 0.1) 0%, rgba(46, 204, 113, 0.1) 100%);
+}
+
+.savings-summary-section .accordion-title {
+    color: #27ae60;
+}
+
+.payment-summary-section .accordion-header {
+    background: linear-gradient(135deg, rgba(243, 156, 18, 0.1) 0%, rgba(230, 126, 34, 0.1) 100%);
+}
+
+.payment-summary-section .accordion-title {
+    color: #f39c12;
+}
+
+/* Value colors */
+.value-primary {
+    color: #667eea;
+}
+
+.value-success {
+    color: #27ae60;
+}
+
+.value-danger {
+    color: #e74c3c;
+}
+
+.value-warning {
+    color: #f39c12;
+}
+
+.value-info {
+    color: #3498db;
+}
+
+.value-purple {
+    color: #9b59b6;
+}
+
+/* Clickable values */
+.accordion-value.clickable {
+    cursor: pointer;
+    text-decoration: underline;
+    transition: all 0.2s ease;
+}
+
+.accordion-value.clickable:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+}
+
+/* Additional Details Row */
+.additional-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.additional-item {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.additional-label {
+    color: #666;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.additional-value {
+    font-size: 1em;
+    font-weight: 700;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .accordion-header {
+        padding: 12px 15px;
+    }
+
+    .accordion-title {
+        font-size: 1em;
+    }
+
+    .accordion-content.expanded {
+        padding: 12px 15px;
+    }
+
+    .accordion-item {
+        padding: 8px 10px;
+    }
+
+    .accordion-label {
+        font-size: 0.85em;
+    }
+
+    .accordion-value {
+        font-size: 1em;
+    }
+
+    .additional-details {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Animation for expand/collapse */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.accordion-content.expanded .accordion-grid {
+    animation: slideDown 0.3s ease;
+}
+
+/* Chevron icon styles */
+.chevron-icon {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+}
+
+/* Add this to www/css/accordion.css or create a new file */
+
+/* Year Summary Accordion Styles */
+.year-summary-accordion {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    display: none;
+    /* Hidden by default, shown when year filter is active */
+}
+
+.year-summary-accordion.show {
+    display: block;
+}
+
+.year-details-section {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.year-details-section .accordion-header {
+    padding: 15px 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+    transition: all 0.3s ease;
+    border-bottom: 2px solid transparent;
+    background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(76, 175, 80, 0.1) 100%);
+}
+
+.year-details-section .accordion-header:hover {
+    background: rgba(33, 150, 243, 0.15);
+}
+
+.year-details-section .accordion-header.active {
+    border-bottom-color: #2196f3;
+}
+
+.year-details-section .accordion-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #2196f3;
+}
+
+/* Override accordion grid for year summary to show all items in a row on desktop */
+@media (min-width: 769px) {
+    .year-details-section .accordion-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .year-details-section .accordion-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+/* Year summary specific item styling */
+.year-details-section .accordion-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 15px 10px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.year-details-section .accordion-item:hover {
+    background: #e3f2fd;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+}
+
+.year-details-section .accordion-label {
+    color: #666;
+    font-size: 0.85em;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.year-details-section .accordion-value {
+    font-size: 1.2em;
+    font-weight: 700;
+}
+
+/* Animation for year summary expand */
+.year-details-section .accordion-content.expanded {
+    animation: slideDown 0.3s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .year-details-section .accordion-header {
+        padding: 12px 15px;
+    }
+
+    .year-details-section .accordion-title {
+        font-size: 1em;
+    }
+
+    .year-details-section .accordion-item {
+        padding: 12px 8px;
+    }
+
+    .year-details-section .accordion-label {
+        font-size: 0.8em;
+    }
+
+    .year-details-section .accordion-value {
+        font-size: 1em;
+    }
+}
