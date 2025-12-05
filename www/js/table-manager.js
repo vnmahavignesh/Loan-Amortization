@@ -1,5 +1,4 @@
-// Enhanced table-manager.js - Table generation with year accordions for "All Years" view
-
+// Table generation and management functions
 function generateTable() {
     if (!validateAllInputs()) {
         alert('Please fix validation errors before generating the table.');
@@ -25,8 +24,11 @@ function generateTable() {
 
         totalInterest += interest;
 
+        // Get total prepayment for this month
         const totalPrepayment = getTotalPrepaymentForMonth(month);
         const prepaymentCount = getPrepaymentCountForMonth(month);
+
+        // Get total charges for this month
         const totalCharges = getTotalChargesForMonth(month);
         const chargesCount = getChargesCountForMonth(month);
 
@@ -58,11 +60,13 @@ function generateTable() {
         allTableRows.push(row);
         tableBody.appendChild(row);
 
+        // Update the prepayment button styling
         if (totalPrepayment > 0) {
             const manageBtn = row.querySelector('.manage-prepayments-btn');
             manageBtn.classList.add('has-prepayments');
         }
 
+        // Update the charges button styling
         if (totalCharges > 0) {
             const manageBtn = row.querySelector('.manage-charges-btn');
             manageBtn.classList.add('has-charges');
@@ -83,13 +87,6 @@ function generateTable() {
     document.getElementById('amortizationTableContainer').style.display = 'block';
 
     updateSavingsSummary();
-
-    const mainTableHeader = document.querySelector('#amortizationTable thead');
-
-    if (mainTableHeader) mainTableHeader.style.display = 'none';
-
-    // Show with year accordions by default
-    renderTableWithYearAccordions();
 
     markAsUnsaved();
 }
@@ -130,6 +127,7 @@ function recomputeTable() {
 
     updateSavingsSummary();
 
+    // Recalculate year totals if a specific year is selected
     const selectedYear = document.getElementById('yearFilterSelect').value;
     if (selectedYear !== 'all') {
         calculateYearTotals(selectedYear);
@@ -158,6 +156,7 @@ function attachRowListeners() {
             toggleRowHighlight(row, checkbox.checked);
             updateSavingsSummary();
 
+            // Recalculate year totals if a specific year is selected
             const selectedYear = document.getElementById('yearFilterSelect').value;
             if (selectedYear !== 'all') {
                 calculateYearTotals(selectedYear);
@@ -206,267 +205,26 @@ function filterByYear() {
     tableBody.innerHTML = '';
 
     if (selectedYear === 'all') {
-        // Hide main table header for All Years view
-        const mainTableHeader = document.querySelector('#amortizationTable thead');
-        if (mainTableHeader) mainTableHeader.style.display = 'none';
-
-        // Show all years with accordion view
-        renderTableWithYearAccordions();
+        allTableRows.forEach(row => {
+            tableBody.appendChild(row);
+        });
         yearSummary.classList.remove('show');
     } else {
-        // Show main table header for single year view
-        const mainTableHeader = document.querySelector('#amortizationTable thead');
-        if (mainTableHeader) mainTableHeader.style.display = '';
-        // Show specific year with table header
         const year = parseInt(selectedYear);
         const startMonth = (year - 1) * 12 + 1;
         const endMonth = Math.min(year * 12, allTableRows.length);
 
-        // Do not add extra table header; main table header is already present
-
         allTableRows.forEach(row => {
             const month = parseInt(row.dataset.month);
             if (month >= startMonth && month <= endMonth) {
-                row.style.display = '';
                 tableBody.appendChild(row);
-            } else {
-                row.style.display = 'none';
             }
         });
 
+        // Calculate and display year totals
         calculateYearTotals(selectedYear);
         yearSummary.classList.add('show');
-
-        setTimeout(() => {
-            initializeYearSummaryAccordion();
-        }, 100);
     }
-}
-
-/**
- * NEW: Render table with year accordion headers
- */
-function renderTableWithYearAccordions() {
-    const tableBody = document.querySelector('#amortizationTable tbody');
-    tableBody.innerHTML = '';
-
-    const totalYears = Math.ceil(allTableRows.length / 12);
-
-    for (let year = 1; year <= totalYears; year++) {
-        const startMonth = (year - 1) * 12 + 1;
-        const endMonth = Math.min(year * 12, allTableRows.length);
-
-        // Calculate year totals
-        const yearTotals = calculateYearTotalsForAccordion(startMonth, endMonth);
-
-        // Create year header row (accordion header)
-        const yearHeaderRow = createYearAccordionHeader(year, yearTotals);
-        tableBody.appendChild(yearHeaderRow);
-
-        // Add table header for this year (will be hidden/shown with accordion)
-        const yearTableHeaderRow = createYearTableHeaderRow();
-        yearTableHeaderRow.classList.add('year-content-row');
-        yearTableHeaderRow.dataset.year = year;
-        tableBody.appendChild(yearTableHeaderRow);
-
-        // Add all months for this year
-        allTableRows.forEach(row => {
-            const month = parseInt(row.dataset.month);
-            if (month >= startMonth && month <= endMonth) {
-                row.classList.add('year-content-row');
-                row.dataset.year = year;
-                tableBody.appendChild(row);
-            }
-        });
-    }
-
-    // Initialize accordion functionality
-    initializeYearAccordions();
-}
-
-// Helper: Create table header row for each year
-function createYearTableHeaderRow() {
-    const headerRow = document.createElement('tr');
-    headerRow.className = 'year-table-header-row';
-    headerRow.innerHTML = `        
-        <th style="text-align:center;">EMI Paid</th>
-        <th style="text-align:center;">Month</th>
-        <th style="text-align:right;padding-right:12px;">Opening Balance</th>
-        <th style="text-align:center;">Rate (%)</th>
-        <th style="text-align:right;padding-right:12px;">Interest</th>
-        <th style="text-align:right;padding-right:12px;">Principal</th>
-        <th style="text-align:right;padding-right:12px;">EMI</th>
-        <th style="text-align:center;">Prepayment</th>
-        <th style="text-align:center;">Charges</th>
-        <th style="text-align:right;padding-right:12px;">Closing Balance</th>
-    `;
-    return headerRow;
-}
-
-/**
- * NEW: Create year accordion header row
- */
-function createYearAccordionHeader(year, totals) {
-    const headerRow = document.createElement('tr');
-    headerRow.className = 'year-accordion-header';
-    headerRow.dataset.year = year;
-
-    headerRow.innerHTML = `
-        <td colspan="10" style="cursor: pointer; user-select: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div style="display: flex; align-items: center; gap: 15px; flex: 1;">
-                    <svg class="year-accordion-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.3s;">
-                        <path d="M6 9l6 6 6-6"/>
-                    </svg>
-                    <span style="font-size: 1.1em; font-weight: 700;">📅 Year ${year}</span>
-                </div>
-                <div style="display: flex; gap: 25px; font-size: 0.9em;">
-                    <span>💰 Principal: ₹${formatIndianNumber(totals.principal.toFixed(2))}</span>
-                    <span>📈 Interest: ₹${formatIndianNumber(totals.interest.toFixed(2))}</span>
-                    <span>💵 Pre-payments: ₹${formatIndianNumber(totals.prepayments.toFixed(2))}</span>
-                    <span>📊 Charges: ₹${formatIndianNumber(totals.charges.toFixed(2))}</span>
-                    <span>💼 Closing: ₹${formatIndianNumber(totals.closing.toFixed(2))}</span>
-                </div>
-            </div>
-        </td>
-    `;
-
-    return headerRow;
-}
-
-/**
- * NEW: Calculate year totals for accordion display
- */
-function calculateYearTotalsForAccordion(startMonth, endMonth) {
-    let principal = 0;
-    let interest = 0;
-    let prepayments = 0;
-    let charges = 0;
-    let closing = 0;
-
-    allTableRows.forEach(row => {
-        const month = parseInt(row.dataset.month);
-        if (month >= startMonth && month <= endMonth) {
-            principal += parseFloat(row.querySelector('.principal').textContent.replace(/,/g, '')) || 0;
-            interest += parseFloat(row.querySelector('.interest').textContent.replace(/,/g, '')) || 0;
-            prepayments += getTotalPrepaymentForMonth(month);
-            charges += getTotalChargesForMonth(month);
-
-            if (month === endMonth) {
-                closing = parseFloat(row.querySelector('.closing').textContent.replace(/,/g, '')) || 0;
-            }
-        }
-    });
-
-    return { principal, interest, prepayments, charges, closing };
-}
-
-/**
- * NEW: Initialize year accordion functionality
- */
-function initializeYearAccordions() {
-    const headers = document.querySelectorAll('.year-accordion-header');
-
-    headers.forEach(header => {
-        const year = header.dataset.year;
-
-        // Check saved state
-        const savedState = localStorage.getItem(`yearAccordion_${year}`);
-        const isExpanded = savedState === null ? true : savedState === 'expanded';
-
-        // Set initial state
-        if (isExpanded) {
-            expandYearAccordion(year);
-        } else {
-            collapseYearAccordion(year);
-        }
-
-        // Add click handler
-        header.addEventListener('click', function () {
-            toggleYearAccordion(year);
-        });
-
-        // Add keyboard support
-        header.setAttribute('tabindex', '0');
-        header.setAttribute('role', 'button');
-        header.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                toggleYearAccordion(year);
-            }
-        });
-    });
-}
-
-/**
- * NEW: Toggle year accordion
- */
-function toggleYearAccordion(year) {
-    const header = document.querySelector(`.year-accordion-header[data-year="${year}"]`);
-    const icon = header.querySelector('.year-accordion-icon');
-    const contentRows = document.querySelectorAll(`.year-content-row[data-year="${year}"]`);
-
-    const isExpanded = icon.style.transform === 'rotate(180deg)';
-
-    if (isExpanded) {
-        collapseYearAccordion(year);
-    } else {
-        expandYearAccordion(year);
-    }
-}
-
-/**
- * NEW: Expand year accordion
- */
-function expandYearAccordion(year) {
-    const header = document.querySelector(`.year-accordion-header[data-year="${year}"]`);
-    const icon = header.querySelector('.year-accordion-icon');
-    const contentRows = document.querySelectorAll(`.year-content-row[data-year="${year}"]`);
-
-    icon.style.transform = 'rotate(180deg)';
-    contentRows.forEach(row => {
-        row.style.display = '';
-    });
-
-    localStorage.setItem(`yearAccordion_${year}`, 'expanded');
-}
-
-/**
- * NEW: Collapse year accordion
- */
-function collapseYearAccordion(year) {
-    const header = document.querySelector(`.year-accordion-header[data-year="${year}"]`);
-    const icon = header.querySelector('.year-accordion-icon');
-    const contentRows = document.querySelectorAll(`.year-content-row[data-year="${year}"]`);
-
-    icon.style.transform = 'rotate(0deg)';
-    contentRows.forEach(row => {
-        row.style.display = 'none';
-    });
-
-    localStorage.setItem(`yearAccordion_${year}`, 'collapsed');
-}
-
-/**
- * NEW: Expand all year accordions
- */
-function expandAllYearAccordions() {
-    const headers = document.querySelectorAll('.year-accordion-header');
-    headers.forEach(header => {
-        const year = header.dataset.year;
-        expandYearAccordion(year);
-    });
-}
-
-/**
- * NEW: Collapse all year accordions
- */
-function collapseAllYearAccordions() {
-    const headers = document.querySelectorAll('.year-accordion-header');
-    headers.forEach(header => {
-        const year = header.dataset.year;
-        collapseYearAccordion(year);
-    });
 }
 
 function calculateYearTotals(selectedYear) {
@@ -483,6 +241,7 @@ function calculateYearTotals(selectedYear) {
     allTableRows.forEach(row => {
         const month = parseInt(row.dataset.month);
         if (month >= startMonth && month <= endMonth) {
+            // Calculate year totals
             const principal = parseFloat(row.querySelector('.principal').textContent.replace(/,/g, '')) || 0;
             const interest = parseFloat(row.querySelector('.interest').textContent.replace(/,/g, '')) || 0;
             const prepayment = getTotalPrepaymentForMonth(month);
@@ -493,12 +252,14 @@ function calculateYearTotals(selectedYear) {
             yearPrepayments += prepayment;
             yearCharges += charges;
 
+            // Get closing balance from the last month of the year
             if (month === endMonth) {
                 yearClosingBalance = parseFloat(row.querySelector('.closing').textContent.replace(/,/g, '')) || 0;
             }
         }
     });
 
+    // Update year summary
     document.getElementById('yearSummaryTitle').textContent = `Year ${year} Summary`;
     document.getElementById('yearPrincipalPaid').textContent = '₹' + formatIndianNumber(yearPrincipalPaid.toFixed(2));
     document.getElementById('yearInterestPaid').textContent = '₹' + formatIndianNumber(yearInterestPaid.toFixed(2));
