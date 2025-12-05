@@ -67,7 +67,8 @@ function updateSavingsSummary() {
 
         const monthlyRate = (globalAnnualRate / 100) / 12;
         if (emi > currentBalance * monthlyRate) {
-            remainingTenure = Math.ceil(-Math.log(1 - (currentBalance * monthlyRate) / emi) / Math.log(1 + monthlyRate));
+            // NEW (FIXED)
+            remainingTenure = Math.round(-Math.log(1 - (currentBalance * monthlyRate) / emi) / Math.log(1 + monthlyRate));
         } else {
             remainingTenure = totalTenure - paidMonths;
         }
