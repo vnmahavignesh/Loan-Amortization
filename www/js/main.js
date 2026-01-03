@@ -101,7 +101,7 @@ function showSaveStatus() {
     }, 3000);
 }
 
-// Helper functions HI
+// Helper functions
 function formatDateToDDMMYYYY(dateString) {
     if (!dateString) return '-';
 
