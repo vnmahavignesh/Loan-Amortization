@@ -89,6 +89,14 @@ function generateTable() {
     updateSavingsSummary();
 
     markAsUnsaved();
+
+    // Disable Change Interest Rate button initially
+    const changeRateBtn = document.getElementById('changeInterestRateBtn');
+    if (changeRateBtn) {
+        changeRateBtn.disabled = true;
+        changeRateBtn.classList.add('dimmed');
+        changeRateBtn.classList.remove('bright');
+    }
 }
 
 function recomputeTable() {
@@ -161,10 +169,47 @@ function attachRowListeners() {
             if (selectedYear !== 'all') {
                 calculateYearTotals(selectedYear);
             }
+
+            // Enable Change Interest Rate button only if first EMI is paid
+            maybeEnableChangeInterestRateBtn();
         };
 
         toggleRowHighlight(row, checkbox.checked);
     });
+
+    // Also check on initial attach
+    maybeEnableChangeInterestRateBtn();
+}
+
+// Enable Change Interest Rate button only if first row is paid
+function maybeEnableChangeInterestRateBtn() {
+    const changeRateBtn = document.getElementById('changeInterestRateBtn');
+    if (!changeRateBtn) return;
+    // Only enable if table exists and first row's checkbox is checked
+    if (allTableRows && allTableRows.length > 0) {
+        const firstRow = allTableRows[0];
+        const firstCheckbox = firstRow.querySelector('input[type="checkbox"]');
+        if (firstCheckbox && firstCheckbox.checked) {
+            if (changeRateBtn.disabled) {
+                // Animate brighten
+                changeRateBtn.classList.remove('dimmed');
+                changeRateBtn.classList.add('bright');
+                setTimeout(() => changeRateBtn.classList.remove('bright'), 800);
+            }
+            changeRateBtn.disabled = false;
+        } else {
+            if (!changeRateBtn.disabled) {
+                // Animate dim
+                changeRateBtn.classList.add('dimmed');
+            }
+            changeRateBtn.disabled = true;
+            changeRateBtn.classList.remove('bright');
+        }
+    } else {
+        changeRateBtn.disabled = true;
+        changeRateBtn.classList.add('dimmed');
+        changeRateBtn.classList.remove('bright');
+    }
 }
 
 function handleTableChange() {
@@ -267,3 +312,35 @@ function calculateYearTotals(selectedYear) {
     document.getElementById('yearCharges').textContent = '₹' + formatIndianNumber(yearCharges.toFixed(2));
     document.getElementById('yearClosingBalance').textContent = '₹' + formatIndianNumber(yearClosingBalance.toFixed(2));
 }
+
+// Change Interest Rate Modal Logic
+window.showChangeInterestRateModal = function () {
+    document.getElementById('changeInterestRateModal').style.display = 'flex';
+    // Optionally prefill with current values
+    const rateInput = document.getElementById('rateInput');
+    const emiInput = document.getElementById('emiInput');
+    document.getElementById('newInterestRateInput').value = rateInput.value;
+    document.getElementById('newEmiAmountInput').value = emiInput.value;
+};
+
+window.closeChangeInterestRateModal = function () {
+    document.getElementById('changeInterestRateModal').style.display = 'none';
+};
+
+window.saveNewInterestRateAndEmi = function () {
+    const newRate = document.getElementById('newInterestRateInput').value;
+    const newEmi = document.getElementById('newEmiAmountInput').value;
+    if (!newRate || parseFloat(newRate) <= 0) {
+        alert('Please enter a valid positive interest rate.');
+        return;
+    }
+    if (!newEmi || parseFloat(newEmi) <= 0) {
+        alert('Please enter a valid positive EMI amount.');
+        return;
+    }
+    document.getElementById('rateInput').value = newRate;
+    document.getElementById('emiInput').value = newEmi;
+    // Optionally trigger recalculation if needed
+    if (typeof handleTableChange === 'function') handleTableChange();
+    window.closeChangeInterestRateModal();
+};

@@ -1,3 +1,18 @@
+/* Animated dim/bright for Change Interest Rate button */
+.btn-change-rate {
+    transition: filter 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-change-rate.dimmed {
+    filter: brightness(0.7) grayscale(0.3);
+    box-shadow: none;
+}
+
+.btn-change-rate.bright {
+    filter: brightness(1.15) drop-shadow(0 0 8px #ff9800cc);
+    box-shadow: 0 0 16px 2px #ff980055;
+}
+
 * {
     margin: 0;
     padding: 0;
