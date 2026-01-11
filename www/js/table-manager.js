@@ -328,19 +328,68 @@ window.closeChangeInterestRateModal = function () {
 };
 
 window.saveNewInterestRateAndEmi = function () {
-    const newRate = document.getElementById('newInterestRateInput').value;
-    const newEmi = document.getElementById('newEmiAmountInput').value;
-    if (!newRate || parseFloat(newRate) <= 0) {
+    const newRate = parseFloat(document.getElementById('newInterestRateInput').value);
+    const newEmi = parseFloat(document.getElementById('newEmiAmountInput').value);
+    if (!newRate || newRate <= 0) {
         alert('Please enter a valid positive interest rate.');
         return;
     }
-    if (!newEmi || parseFloat(newEmi) <= 0) {
+    if (!newEmi || newEmi <= 0) {
         alert('Please enter a valid positive EMI amount.');
         return;
     }
     document.getElementById('rateInput').value = newRate;
     document.getElementById('emiInput').value = newEmi;
-    // Optionally trigger recalculation if needed
-    if (typeof handleTableChange === 'function') handleTableChange();
+
+
+    // Find the last paid row index and its closing balance
+    let lastPaidIdx = -1;
+    let lastPaidClosing = 0;
+    for (let i = 0; i < allTableRows.length; i++) {
+        const row = allTableRows[i];
+        const checkbox = row.querySelector('input[type="checkbox"]');
+        if (checkbox && checkbox.checked) {
+            lastPaidIdx = i;
+            lastPaidClosing = parseFloat(row.querySelector('.closing').textContent.replace(/,/g, '')) || 0;
+        }
+    }
+
+    // Start recalculation from the first unpaid row
+    let openingBalance = lastPaidClosing;
+    for (let i = lastPaidIdx + 1; i < allTableRows.length; i++) {
+        const row = allTableRows[i];
+        // Only update unpaid rows
+        const month = parseInt(row.dataset.month);
+        const prepayment = getTotalPrepaymentForMonth(month);
+        const otherCharges = getTotalChargesForMonth(month);
+        const monthlyRate = (newRate / 100) / 12;
+        const interest = openingBalance * monthlyRate;
+        let principal = newEmi - interest;
+        if (principal < 0) principal = 0;
+        let closingBalance = openingBalance - principal - prepayment + otherCharges;
+        if (closingBalance < 0) closingBalance = 0;
+
+        row.querySelector('.opening').textContent = formatIndianNumber(openingBalance.toFixed(2));
+        row.querySelector('.interest').textContent = formatIndianNumber(interest.toFixed(2));
+        row.querySelector('.principal').textContent = formatIndianNumber(principal.toFixed(2));
+        row.querySelector('.emi').textContent = formatIndianNumber((interest + principal).toFixed(2));
+        row.querySelector('.closing').textContent = formatIndianNumber(closingBalance.toFixed(2));
+
+        // Also update the rate input value for this row
+        const rateInput = row.querySelector('.rate-input');
+        if (rateInput) rateInput.value = newRate.toFixed(2);
+
+        openingBalance = closingBalance;
+    }
+
+    updateSavingsSummary();
+
+    // Recalculate year totals if a specific year is selected
+    const selectedYear = document.getElementById('yearFilterSelect').value;
+    if (selectedYear !== 'all') {
+        calculateYearTotals(selectedYear);
+    }
+
+    markAsUnsaved();
     window.closeChangeInterestRateModal();
 };
