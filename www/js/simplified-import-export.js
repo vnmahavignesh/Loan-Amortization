@@ -48,7 +48,7 @@ function exportAmortizationToCSV() {
 
     // Add monthly amortization data header
     csv += '### MONTHLY SCHEDULE ###\n';
-    csv += 'EMI Paid,Month,Opening Balance,Interest Rate (%),Interest,Principal,EMI,Pre-payment,Pre-payment Date,Pre-payment Description,Other Charges,Other Charges Date,Other Charges Description,Closing Balance\n';
+    csv += 'EMI Paid,Month,Opening Balance,Interest Rate (%),Interest,Principal,EMI,Pre-payment Total,Pre-payment Amounts,Pre-payment Date,Pre-payment Description,Other Charges Total,Charges Amounts,Other Charges Date,Other Charges Description,Closing Balance\n';
 
     // Add each month's data
     allTableRows.forEach(row => {
@@ -67,22 +67,26 @@ function exportAmortizationToCSV() {
 
         // Get prepayment data for this month
         let prepaymentAmount = 0;
+        let prepaymentAmounts = [];
         let prepaymentDate = '';
         let prepaymentDesc = '';
 
         if (prepaymentsData[month] && prepaymentsData[month].length > 0) {
             prepaymentAmount = prepaymentsData[month].reduce((sum, p) => sum + p.amount, 0);
+            prepaymentAmounts = prepaymentsData[month].map(p => p.amount.toFixed(2));
             prepaymentDate = prepaymentsData[month].map(p => p.date || '').join('; ');
             prepaymentDesc = prepaymentsData[month].map(p => p.description || '').filter(d => d).join('; ');
         }
 
         // Get charges data for this month
         let chargesAmount = 0;
+        let chargesAmounts = [];
         let chargesDate = '';
         let chargesDesc = '';
 
         if (chargesData[month] && chargesData[month].length > 0) {
             chargesAmount = chargesData[month].reduce((sum, c) => sum + c.amount, 0);
+            chargesAmounts = chargesData[month].map(c => c.amount.toFixed(2));
             chargesDate = chargesData[month].map(c => c.date || '').join('; ');
             chargesDesc = chargesData[month].map(c => c.description || '').filter(d => d).join('; ');
         }
@@ -90,8 +94,10 @@ function exportAmortizationToCSV() {
         // Escape and format fields
         const escapedPrepaymentDesc = `"${prepaymentDesc.replace(/"/g, '""')}"`;
         const escapedChargesDesc = `"${chargesDesc.replace(/"/g, '""')}"`;
+        const prepaymentAmountsStr = prepaymentAmounts.join('; ');
+        const chargesAmountsStr = chargesAmounts.join('; ');
 
-        csv += `${emiPaid},${month},${opening.toFixed(2)},${rate},${interest.toFixed(2)},${principal.toFixed(2)},${emiValue.toFixed(2)},${prepaymentAmount.toFixed(2)},${prepaymentDate},${escapedPrepaymentDesc},${chargesAmount.toFixed(2)},${chargesDate},${escapedChargesDesc},${closing.toFixed(2)}\n`;
+        csv += `${emiPaid},${month},${opening.toFixed(2)},${rate},${interest.toFixed(2)},${principal.toFixed(2)},${emiValue.toFixed(2)},${prepaymentAmount.toFixed(2)},${prepaymentAmountsStr},${prepaymentDate},${escapedPrepaymentDesc},${chargesAmount.toFixed(2)},${chargesAmountsStr},${chargesDate},${escapedChargesDesc},${closing.toFixed(2)}\n`;
     });
 
     downloadCSV(csv, 'loan_amortization_complete.csv');
@@ -367,6 +373,7 @@ function parseAndRestoreCompleteData(csvText) {
             if (!line) continue;
 
             const values = parseCSVLine(line);
+            // Support both old format (14 columns) and new format (16 columns with individual amounts)
             if (values.length < 14) continue;
 
             const month = parseInt(values[1]);
@@ -376,11 +383,13 @@ function parseAndRestoreCompleteData(csvText) {
                 month: month,
                 rate: parseFloat(values[3]),
                 prepaymentAmount: parseFloat(values[7]),
-                prepaymentDate: values[8],
-                prepaymentDesc: values[9],
-                chargesAmount: parseFloat(values[10]),
-                chargesDate: values[11],
-                chargesDesc: values[12]
+                prepaymentAmounts: values[8] || '', // New: individual amounts
+                prepaymentDate: values[9] || '',
+                prepaymentDesc: values[10] || '',
+                chargesAmount: parseFloat(values[11]),
+                chargesAmounts: values[12] || '', // New: individual amounts
+                chargesDate: values[13] || '',
+                chargesDesc: values[14] || ''
             };
 
             monthlyRows.push(rowData);
@@ -391,10 +400,21 @@ function parseAndRestoreCompleteData(csvText) {
                     importedPrepaymentsData[month] = [];
                 }
 
-                const dates = rowData.prepaymentDate.split(';').map(d => d.trim());
+                const dates = rowData.prepaymentDate.split(';').map(d => d.trim()).filter(d => d);
                 const descs = rowData.prepaymentDesc.split(';').map(d => d.trim());
+                const amounts = rowData.prepaymentAmounts ? rowData.prepaymentAmounts.split(';').map(a => parseFloat(a.trim())) : [];
 
-                if (dates.length > 1) {
+                if (amounts.length > 0 && amounts.length === dates.length) {
+                    // New format: use individual amounts
+                    dates.forEach((date, idx) => {
+                        importedPrepaymentsData[month].push({
+                            amount: amounts[idx] || 0,
+                            date: date || '',
+                            description: descs[idx] || ''
+                        });
+                    });
+                } else if (dates.length > 1) {
+                    // Old format: split total equally among dates
                     const amountPerEntry = rowData.prepaymentAmount / dates.length;
                     dates.forEach((date, idx) => {
                         importedPrepaymentsData[month].push({
@@ -404,6 +424,7 @@ function parseAndRestoreCompleteData(csvText) {
                         });
                     });
                 } else {
+                    // Single entry
                     importedPrepaymentsData[month].push({
                         amount: rowData.prepaymentAmount,
                         date: rowData.prepaymentDate || '',
@@ -418,10 +439,21 @@ function parseAndRestoreCompleteData(csvText) {
                     importedChargesData[month] = [];
                 }
 
-                const dates = rowData.chargesDate.split(';').map(d => d.trim());
+                const dates = rowData.chargesDate.split(';').map(d => d.trim()).filter(d => d);
                 const descs = rowData.chargesDesc.split(';').map(d => d.trim());
+                const amounts = rowData.chargesAmounts ? rowData.chargesAmounts.split(';').map(a => parseFloat(a.trim())) : [];
 
-                if (dates.length > 1) {
+                if (amounts.length > 0 && amounts.length === dates.length) {
+                    // New format: use individual amounts
+                    dates.forEach((date, idx) => {
+                        importedChargesData[month].push({
+                            amount: amounts[idx] || 0,
+                            date: date || '',
+                            description: descs[idx] || ''
+                        });
+                    });
+                } else if (dates.length > 1) {
+                    // Old format: split total equally among dates
                     const amountPerEntry = rowData.chargesAmount / dates.length;
                     dates.forEach((date, idx) => {
                         importedChargesData[month].push({
@@ -431,6 +463,7 @@ function parseAndRestoreCompleteData(csvText) {
                         });
                     });
                 } else {
+                    // Single entry
                     importedChargesData[month].push({
                         amount: rowData.chargesAmount,
                         date: rowData.chargesDate || '',
